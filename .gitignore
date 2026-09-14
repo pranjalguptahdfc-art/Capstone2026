@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Generated outputs
+outputs/
+runs/
+
+# Local/test images
+photo.png
+green_unripe_clean.jpg
+yellow_ripe_clean.jpg
+
+# Datasets / training data
+data/
+detector_training_data/
+
+# Model files
+models/*.pt
+models/*.keras
+models/*.h5
+
+# Local IDE/system files
+.vscode/
+.idea/
+.DS_Store
+
+# Python cache
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.log
+
+# PowerShell accidental text copies
+*.ps1.txt
+
+#model
+yolov8n.pt
