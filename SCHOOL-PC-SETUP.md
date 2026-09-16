@@ -6,10 +6,31 @@ Your complete workflow for using Claude Code on a shared school PC.
 
 ## Step 1 — Install Claude Code (first time only)
 
+### Option A — Admin (preferred)
+
 In PowerShell (Admin):
 ```powershell
 irm anthropic.com/install.ps5 | iex
 ```
+
+### Option B — No admin (user-only install)
+
+If you don't have admin rights, try this instead:
+
+```powershell
+npm install -g @anthropic-ai/claude-code
+```
+
+This installs to your user folder, not system-wide. If `npm` itself is blocked, ask IT to install Claude Code for you — it's a simple Node.js app and usually fast to approve.
+
+**Quick test** to see what's available on the PC:
+```powershell
+node --version
+npm --version
+claude --version
+```
+
+If `claude --version` works already, skip this entire step.
 
 ---
 
