@@ -21,10 +21,7 @@ yellow_ripe_clean.jpg
 data/
 detector_training_data/
 
-# Model files
-models/*.pt
-models/*.keras
-models/*.h5
+
 
 # Local IDE/system files
 .vscode/
@@ -38,8 +35,12 @@ models/*.h5
 *.tmp
 *.log
 
+# Model files (large binaries — download separately)
+*.pt
+*.h5
+
+# Session / memory files (local only, never push)
+.claude/
+
 # PowerShell accidental text copies
 *.ps1.txt
-
-#model
-yolov8n.pt
