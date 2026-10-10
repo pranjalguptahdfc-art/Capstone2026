@@ -1,0 +1,186 @@
+"""
+color_analyzer.py
+-----------------
+HSV color analysis for banana ripeness detection.
+
+No ML model — just OpenCV color thresholding.
+Analyzes each detected banana region and classifies it as green (unripe),
+yellow (ripe), or brown (overripe) based on pixel percentages.
+
+HSV Thresholds:
+  Green  (unripe)  : H 35-85,  S 30-255, V 30-255
+  Yellow (ripe)    : H 15-35,  S 30-255, V 80-255
+  Brown  (overripe): H  0-25,  S 10-200, V 20-200
+"""
+
+import cv2
+import numpy as np
+from typing import Optional
+
+
+# ── HSV thresholds ──────────────────────────────────────────────────────────
+
+HSV_RANGES = {
+    "green": {
+        "lower": np.array([35, 30, 30], dtype=np.uint8),
+        "upper": np.array([85, 255, 255], dtype=np.uint8),
+    },
+    "yellow": {
+        "lower": np.array([15, 30, 80], dtype=np.uint8),
+        "upper": np.array([35, 255, 255], dtype=np.uint8),
+    },
+    "brown": {
+        "lower": np.array([0, 10, 20], dtype=np.uint8),
+        "upper": np.array([25, 200, 200], dtype=np.uint8),
+    },
+}
+
+COLOR_TO_RIPENESS = {
+    "green": "unripe",
+    "yellow": "ripe",
+    "brown": "overripe",
+    "semi-ripe": "semi-ripe",
+}
+
+
+def analyze_region(
+    image_bgr: np.ndarray,
+    bbox: list[int],
+) -> dict:
+    """
+    Analyze a single banana region for color distribution.
+
+    Parameters
+    ----------
+    image_bgr : np.ndarray
+        Full BGR image.
+    bbox : list[int]
+        [x1, y1, x2, y2] bounding box.
+
+    Returns
+    -------
+    dict with keys:
+        green_pct, yellow_pct, brown_pct, other_pct,
+        dominant_color, ripeness_class, pixel_counts
+    """
+    x1, y1, x2, y2 = bbox
+    region = image_bgr[y1:y2, x1:x2]
+    if region.size == 0:
+        return _empty_result()
+
+    hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
+    total = region.shape[0] * region.shape[1]
+
+    counts = {}
+    for color_name, hsv_dict in HSV_RANGES.items():
+        mask = cv2.inRange(hsv, hsv_dict["lower"], hsv_dict["upper"])
+        counts[color_name] = int(np.count_nonzero(mask))
+
+    green_pct = round(counts["green"] / total * 100, 1)
+    yellow_pct = round(counts["yellow"] / total * 100, 1)
+    brown_pct = round(counts["brown"] / total * 100, 1)
+    other_pct = round(100 - green_pct - yellow_pct - brown_pct, 1)
+
+    # Brown spots dominate: if >20%, it's overripe regardless of green/yellow
+    if brown_pct > 20:
+        dominant_color = "brown"
+        ripeness_class = "overripe"
+    # Both green and yellow are significant → mid-ripening (semi-ripe)
+    elif green_pct > 20 and yellow_pct > 35:
+        dominant_color = "semi-ripe"
+        ripeness_class = "semi-ripe"
+    else:
+        dominant_color = max(counts, key=counts.get)
+        ripeness_class = COLOR_TO_RIPENESS.get(dominant_color, "unknown")
+
+    return {
+        "green_pct": green_pct,
+        "yellow_pct": yellow_pct,
+        "brown_pct": brown_pct,
+        "other_pct": other_pct,
+        "dominant_color": dominant_color,
+        "ripeness_class": ripeness_class,
+        "pixel_counts": {
+            "green": counts["green"],
+            "yellow": counts["yellow"],
+            "brown": counts["brown"],
+            "total_analyzed": total,
+        },
+    }
+
+
+def analyze_batch(
+    image_bgr: np.ndarray,
+    detections: list[dict],
+) -> list[dict]:
+    """
+    Analyze color for each detected banana region.
+
+    Parameters
+    ----------
+    image_bgr : np.ndarray
+        Full BGR image.
+    detections : list[dict]
+        Each dict has "bbox": [x1, y1, x2, y2].
+
+    Returns
+    -------
+    list of dict — one analysis result per detection.
+    """
+    results = []
+    for det in detections:
+        analysis = analyze_region(image_bgr, det["bbox"])
+        analysis["banana_id"] = det.get("banana_id", len(results) + 1)
+        results.append(analysis)
+    return results
+
+
+def annotate_colors(
+    image_bgr: np.ndarray,
+    detections: list[dict],
+    analyses: list[dict],
+) -> np.ndarray:
+    """
+    Draw bounding boxes with color-based labels on the image.
+
+    Box colors: green=unripe, yellow=ripe, red=overripe.
+    """
+    annotated = image_bgr.copy()
+    BGR_COLORS = {
+        "unripe":     (0, 200, 0),
+        "ripe":       (0, 200, 255),
+        "semi-ripe":  (255, 165, 0),
+        "overripe":   (0, 60, 220),
+        "unknown":    (200, 200, 200),
+    }
+
+    for i, (det, analysis) in enumerate(zip(detections, analyses)):
+        x1, y1, x2, y2 = det["bbox"]
+        cls = analysis.get("ripeness_class", "unknown")
+        color = BGR_COLORS.get(cls, BGR_COLORS["unknown"])
+
+        thick = max(2, int(min(image_bgr.shape[:2]) * 0.003))
+        cv2.rectangle(annotated, (x1, y1), (x2, y2), color, thick)
+
+        label = f"#{det.get('banana_id', i+1)} {cls.upper()}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        scale = max(0.5, min(image_bgr.shape[:2]) * 0.001)
+        (tw, th), _ = cv2.getTextSize(label, font, scale, 1)
+
+        cv2.rectangle(annotated, (x1, y1 - th - 4), (x1 + tw + 4, y1), color, -1)
+        cv2.putText(annotated, label, (x1 + 2, y1 - 2),
+                    font, scale, (0, 0, 0), 1, cv2.LINE_AA)
+
+    return annotated
+
+
+def _empty_result() -> dict:
+    return {
+        "green_pct": 0.0,
+        "yellow_pct": 0.0,
+        "brown_pct": 0.0,
+        "other_pct": 100.0,
+        "dominant_color": "other",
+        "ripeness_class": "unknown",
+        "pixel_counts": {"green": 0, "yellow": 0, "brown": 0, "total_analyzed": 0},
+    }

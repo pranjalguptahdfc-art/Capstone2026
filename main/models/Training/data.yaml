@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['overripe', 'ripe', 'underripe']
+
+roboflow:
+  workspace: banana-w6gb6
+  project: saba-banana-bunch-az0xo
+  version: 4
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/banana-w6gb6/saba-banana-bunch-az0xo/dataset/4
