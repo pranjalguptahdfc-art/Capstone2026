@@ -45,7 +45,7 @@ class BananaDetector:
         Path to `banana_detector.pt`.  If the file does not exist the generic
         YOLOv8n COCO model is used as a development fallback.
     confidence_threshold : float
-        Minimum detection confidence (0–1).  Default: 0.40.
+        Minimum detection confidence (0–1).  Default: 0.20.
     device : str
         Inference device: 'cpu', '0', '1', etc.  Default: 'cpu'.
     """
@@ -53,7 +53,7 @@ class BananaDetector:
     def __init__(
         self,
         model_path: Optional[Union[str, Path]] = None,
-        confidence_threshold: float = 0.40,
+        confidence_threshold: float = 0.20,
         device: str = "cpu",
     ):
         # Resolve model path
