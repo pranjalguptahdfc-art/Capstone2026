@@ -363,13 +363,17 @@ Use: pyserial library
 ## Files
 
 ```
-app.py                        # Streamlit UI — entry point
-sensor/gas_reader.py          # DHT-11 reader (demo + serial modes)
-vision/color_analyzer.py      # HSV color segmentation + classification
-fusion/fusion_engine.py       # Sensor + color fusion → bunch verdict
-utils/image_utils.py          # Crop, annotate, color conversion
-bunch_analyzer.py             # Orchestrator: detection → analysis → fusion
-detection/banana_detector.py  # Contour-based banana detection (traditional CV)
+app.py                            # Streamlit UI — entry point
+bunch_analyzer.py                 # Orchestrator: detection → analysis → fusion
+classification/ripeness_classifier.py  # Per-crop ripeness classification
+detection/banana_detector.py      # YOLOv8-based banana detection (to be replaced with contours)
+fusion/fusion_engine.py           # Sensor + color fusion → bunch verdict
+processing/bunch_analyzer.py      # Processing layer
+sensor/gas_reader.py              # DHT-11 reader (demo + serial modes)
+tests/test_bunch_logic.py         # Unit tests — bunch fusion logic
+tests/test_pipeline.py            # Integration tests — full pipeline
+utils/image_utils.py              # Crop, annotate, color conversion
+vision/color_analyzer.py          # HSV color segmentation + classification
 ```
 
 ---
@@ -410,6 +414,8 @@ pyserial          # For ESP-32 serial communication
 ## Confidence Scoring
 
 Every detection result should include a confidence score so the user knows how sure the system is.
+
+> **Default confidence threshold is 0.20.** This was chosen so that the detection pipeline is permissive enough to catch bananas in low-light or partially obscured images. The Streamlit UI slider also defaults to 0.20. Users can raise it for stricter filtering.
 
 ### Per-Banana Confidence
 
