@@ -34,6 +34,60 @@ DEFAULT_MODEL_PATH = _PROJECT_ROOT / "models" / "banana_detector_single.pt"
 FALLBACK_MODEL = _PROJECT_ROOT / "models" / "yolov8n.pt"
 SINGLE_MODEL_PATH = DEFAULT_MODEL_PATH  # alias for test compatibility
 
+# Adaptive detection pipeline (non-teachable post-processing, no retraining)
+ADAPTIVE_INFERENCE_CONF = 0.10   # pass-1 inference always runs this low to catch occluded bananas
+RELATIVE_KEEP_RATIO = 0.30      # keep boxes at >= best_score * this ratio
+ABSOLUTE_FLOOR = 0.08          # ... but never below this
+NMS_IOU_THRESHOLD = 0.50       # score-ordered NMS suppression threshold
+
+
+def _iou(a: list, b: list) -> float:
+    x1 = max(a[0], b[0]); y1 = max(a[1], b[1])
+    x2 = min(a[2], b[2]); y2 = min(a[3], b[3])
+    inter = max(0, x2 - x1) * max(0, y2 - y1)
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+    union = area_a + area_b - inter
+    return inter / union if union > 0 else 0.0
+
+
+def relative_score_filter(
+    detections: list,
+    relative_keep_ratio: Optional[float] = None,
+    absolute_floor: Optional[float] = None,
+) -> list:
+    """Keep boxes whose score clears max(best * ratio, floor).
+
+    The image's own best detection sets the quality bar, so junk boxes on
+    cluttered images are dropped while a weak-but-real bunch on a clean
+    image survives.
+    """
+    if not detections:
+        return []
+    ratio = RELATIVE_KEEP_RATIO if relative_keep_ratio is None else relative_keep_ratio
+    floor = ABSOLUTE_FLOOR if absolute_floor is None else absolute_floor
+    best = max(d["confidence"] for d in detections)
+    threshold = max(best * ratio, floor)
+    return [d for d in detections if d["confidence"] >= threshold]
+
+
+def suppress_duplicates(detections: list, iou_threshold: Optional[float] = None) -> list:
+    """Score-ordered NMS: suppress boxes overlapping an already-kept box.
+
+    Higher-confidence boxes win. Distinct adjacent bananas (IoU < threshold)
+    are not suppressed. Re-numbers banana_id in confidence order.
+    """
+    iou_t = NMS_IOU_THRESHOLD if iou_threshold is None else iou_threshold
+    ordered = sorted(detections, key=lambda d: d["confidence"], reverse=True)
+    kept: list = []
+    for d in ordered:
+        if any(_iou(d["bbox"], k["bbox"]) >= iou_t for k in kept):
+            continue
+        kept.append(d)
+    for i, d in enumerate(kept, start=1):
+        d["banana_id"] = i
+    return kept
+
 
 class BananaDetector:
     """
@@ -129,20 +183,28 @@ class BananaDetector:
         self,
         image: np.ndarray,
         confidence_threshold: Optional[float] = None,
+        floor: bool = True,
     ) -> List[Dict[str, Any]]:
         """
         Run banana detection on an image.
 
-        Uses two passes: (1) original image at the requested confidence,
-        then (2) a contrast-enhanced version at lower confidence if the
-        first pass finds nothing — this helps detect dark/overripe bananas.
+        Adaptive pipeline (non-teachable): infer permissively to surface all
+        candidates, then filter by the image's own best score and remove
+        duplicates with score-ordered NMS.
+
+        If no bananas survive, falls back to (2) a contrast-enhanced image,
+        then (3) all-COCO-classes — each run through the same filter.
 
         Parameters
         ----------
         image : np.ndarray
             BGR image (as returned by cv2.imread).
         confidence_threshold : float, optional
-            Override the instance-level threshold for this call.
+            Overrides the instance threshold. When floor=True (default) it
+            acts as the absolute floor for the relative score filter; the
+            inference itself still runs at ADAPTIVE_INFERENCE_CONF so
+            occluded bananas are not pre-dropped. When floor=False the
+            built-in ABSOLUTE_FLOOR is used instead.
 
         Returns
         -------
@@ -158,22 +220,31 @@ class BananaDetector:
             raise RuntimeError("Detector model is not loaded.")
 
         conf = confidence_threshold if confidence_threshold is not None else self.confidence_threshold
+        abs_floor = conf if floor else ABSOLUTE_FLOOR
 
-        # Pass 1: original image at requested confidence (banana class only)
-        detections = self._run_inference(image, conf)
+        def _postprocess(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+            if not candidates:
+                return []
+            candidates = relative_score_filter(candidates, absolute_floor=abs_floor)
+            return suppress_duplicates(candidates)
+
+        # Pass 1: original image at a low confidence (finds occluded bananas)
+        detections = _postprocess(self._run_inference(image, ADAPTIVE_INFERENCE_CONF))
 
         # Pass 2: contrast-enhanced image at lower confidence
         if not detections:
             logger.info("Pass 1 found nothing. Trying contrast-enhanced image...")
             enhanced = self._preprocess(image)
-            detections = self._run_inference(enhanced, min(conf, 0.15))
+            detections = _postprocess(
+                self._run_inference(enhanced, min(ADAPTIVE_INFERENCE_CONF, 0.15))
+            )
 
         # Pass 3: last resort — try ALL COCO classes on the original image
         # A very dark/rotten single banana might not match the banana class,
         # but could still be detected as a generic object
         if not detections:
             logger.info("Pass 2 found nothing. Trying all-class fallback...")
-            detections = self._run_inference_all_classes(image, 0.05)
+            detections = _postprocess(self._run_inference_all_classes(image, 0.05))
 
         logger.debug(f"Detected {len(detections)} banana(s).")
         return detections
