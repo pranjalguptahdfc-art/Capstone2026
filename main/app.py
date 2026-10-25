@@ -68,10 +68,19 @@ def main():
 
     with st.sidebar:
         st.header("Settings")
-        conf_threshold = st.slider(
-            "Detection confidence", min_value=0.10, max_value=0.90,
-            value=0.20, step=0.05,
+        det_mode = st.radio(
+            "Detection mode", ["Auto", "Manual"], index=0,
+            help="Auto adapts to each image (recommended). Manual uses your threshold as a floor.",
         )
+        if det_mode == "Auto":
+            conf_threshold, _floor = 0.10, False
+            st.caption("Adaptive: detects all bananas, then removes low-confidence duplicates.")
+        else:
+            conf_threshold = st.slider(
+                "Confidence floor", min_value=0.05, max_value=0.90,
+                value=0.20, step=0.05,
+            )
+            _floor = True
 
         st.divider()
         st.subheader("Gas Sensor")
@@ -105,8 +114,8 @@ def main():
 
         st.divider()
         st.caption("How it works:")
-        st.caption("1. CLAHE enhances dark/overripe bananas")
-        st.caption("2. YOLOv8n COCO detects the bunch")
+        st.caption("1. YOLOv8 detects the bunch (adaptive: finds all, removes duplicates)")
+        st.caption("2. Banana-mask isolates the fruit, ignores the background")
         st.caption("3. HSV color classifies each banana")
         st.caption("4. Fusion engine computes bunch verdict")
 
@@ -135,7 +144,11 @@ def main():
 
     with st.spinner("Detecting bananas..."):
         try:
-            detections = detector.detect(bgr_image, confidence_threshold=conf_threshold)
+            detections = detector.detect(
+                bgr_image,
+                confidence_threshold=conf_threshold,
+                floor=_floor,
+            )
         except Exception as e:
             st.error(f"Detection failed: {e}")
             return
