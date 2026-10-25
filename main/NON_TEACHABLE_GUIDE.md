@@ -107,6 +107,8 @@ The ESP-32 sends a JSON payload:
 | `bunch_analyzer.py` | **Done** | Orchestrates detection → color analysis → fusion |
 | Semi-ripe classification | **Done** | Detects mid-ripening when green + yellow both present |
 | Detection fallback | **Done** | 3-pass detection (YOLO → CLAHE enhanced → all-class fallback) |
+| Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) before HSV, so stand/crate/other-banana colors don't skew ripeness |
+| Adaptive detection | **Done** | Infer at 0.10 → relative score filter (max(best×0.30, 0.08)) → score-ordered NMS (IoU 0.5). UI has Auto mode (no floor) / Manual mode (threshold = floor) |
 
 ### Remaining
 
@@ -555,8 +557,17 @@ This is Round 2/3 scope. The architecture must support it, but full multi-fruit 
 
 ## What We're NOT Building
 
-- No ML model training or fine-tuning
-- No YOLO, no object detection networks
+- No ML model training or fine-tuning at runtime
+- No object-detection *training* — the YOLOv8 model ships pre-trained and is
+  never retrained; "non-teachable" means no learning loop, not no detector
 - No cloud inference — all processing is local
 - No mobile app — web interface only (Streamlit)
 - No database — runs on uploaded images and live sensor data
+
+## Design Decisions & Trade-offs
+
+| Decision | Alternative | Why |
+|----------|-------------|-----|
+| Adaptive detection | Fixed confidence threshold | One threshold can't fit all images (occluded bananas vs. duplicate boxes). We infer at 0.10, then filter by the image's own best score + NMS. |
+| Banana-mask color analysis | Whole-box pixel average | Background (green stand, yellow shelf) used to skew ripeness. Now we mask to the banana body (center-touching component) before HSV. |
+| Detection as a floor, not a cutoff | Hard confidence cutoff | The user's threshold removes only boxes *below* the floor after relative filtering — weak-but-real bunches on clean images still survive. |
