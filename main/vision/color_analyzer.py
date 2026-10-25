@@ -68,13 +68,31 @@ def analyze_region(
     if region.size == 0:
         return _empty_result()
 
-    hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
-    total = region.shape[0] * region.shape[1]
+    from .banana_mask import banana_crop, banana_mask, banana_mask
+
+    # Isolate the banana body so background colors (stand, crate, other
+    # bananas) do not bleed into the HSV analysis.
+    analyzed = banana_crop(region)
+    background_suppressed = bool(analyzed.size > 0 and analyzed.size < region.size)
+
+    hsv = cv2.cvtColor(analyzed, cv2.COLOR_BGR2HSV)
+    if background_suppressed:
+        pixel_mask = banana_mask(analyzed)
+        total = int(np.count_nonzero(pixel_mask))
+    else:
+        pixel_mask = None
+        total = analyzed.shape[0] * analyzed.shape[1]
+    if total == 0:
+        empty = _empty_result()
+        empty["background_suppressed"] = background_suppressed
+        return empty
 
     counts = {}
     for color_name, hsv_dict in HSV_RANGES.items():
-        mask = cv2.inRange(hsv, hsv_dict["lower"], hsv_dict["upper"])
-        counts[color_name] = int(np.count_nonzero(mask))
+        in_range = cv2.inRange(hsv, hsv_dict["lower"], hsv_dict["upper"])
+        if pixel_mask is not None:
+            in_range = cv2.bitwise_and(in_range, pixel_mask)
+        counts[color_name] = int(np.count_nonzero(in_range))
 
     green_pct = round(counts["green"] / total * 100, 1)
     yellow_pct = round(counts["yellow"] / total * 100, 1)
@@ -104,8 +122,10 @@ def analyze_region(
             "green": counts["green"],
             "yellow": counts["yellow"],
             "brown": counts["brown"],
+            "banana_pixels": total,
             "total_analyzed": total,
         },
+        "background_suppressed": background_suppressed,
     }
 
 
@@ -182,5 +202,7 @@ def _empty_result() -> dict:
         "other_pct": 100.0,
         "dominant_color": "other",
         "ripeness_class": "unknown",
-        "pixel_counts": {"green": 0, "yellow": 0, "brown": 0, "total_analyzed": 0},
+        "pixel_counts": {"green": 0, "yellow": 0, "brown": 0,
+                         "banana_pixels": 0, "total_analyzed": 0},
+        "background_suppressed": False,
     }
