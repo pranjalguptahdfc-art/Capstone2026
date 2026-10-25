@@ -42,6 +42,13 @@ COLOR_TO_RIPENESS = {
     "semi-ripe": "semi-ripe",
 }
 
+# When the banana mask can't isolate the body (the crop is solid banana-colored
+# or the mask is invalid), analysis falls back to the central core of the box.
+# A banana occupies the center of its own bounding box; a same-coloured
+# background (market stand, crate) typically frames the edges. Restricting to
+# this core keeps those edge pixels out of the ripeness math.
+CENTER_FRAC = 0.6
+
 
 def analyze_region(
     image_bgr: np.ndarray,
@@ -68,18 +75,24 @@ def analyze_region(
     if region.size == 0:
         return _empty_result()
 
-    from .banana_mask import banana_crop, banana_mask, banana_mask
+    from .banana_mask import banana_crop, banana_mask, center_crop
 
     # Isolate the banana body so background colors (stand, crate, other
     # bananas) do not bleed into the HSV analysis.
     analyzed = banana_crop(region)
     background_suppressed = bool(analyzed.size > 0 and analyzed.size < region.size)
 
-    hsv = cv2.cvtColor(analyzed, cv2.COLOR_BGR2HSV)
     if background_suppressed:
+        # Banana-colored mask cleanly isolated the body — use it.
+        hsv = cv2.cvtColor(analyzed, cv2.COLOR_BGR2HSV)
         pixel_mask = banana_mask(analyzed)
         total = int(np.count_nonzero(pixel_mask))
     else:
+        # Mask is solid or invalid (e.g. banana and background share a color,
+        # or the box is mostly banana). Fall back to the central core so
+        # same-colored background framing the edges is excluded.
+        analyzed = center_crop(region, CENTER_FRAC)
+        hsv = cv2.cvtColor(analyzed, cv2.COLOR_BGR2HSV)
         pixel_mask = None
         total = analyzed.shape[0] * analyzed.shape[1]
     if total == 0:

@@ -67,6 +67,22 @@ def test_green_banana_still_unripe():
     assert result["ripeness_class"] in ("unripe", "semi-ripe")
 
 
+def test_same_color_background_does_not_flip_ripe():
+    # The image-5 scenario: yellow banana body with a GREEN background that
+    # also matches the "unripe green" window. The mask is solid, so the
+    # center-core fallback must run and keep the reading ripe.
+    size = 160
+    crop = np.full((size, size, 3), BGREEN, dtype=np.uint8)
+    # Diagonal yellow banana through the center of the box
+    for t in np.linspace(0, 1, 40):
+        x = int(20 + t * (size - 40))
+        y = int(size - 20 - t * (size - 40))
+        cv2.circle(crop, (x, y), 14, BAYER, -1)
+    result = analyze_region(crop, [0, 0, size, size])
+    assert result["ripeness_class"] == "ripe", result
+    assert result["yellow_pct"] > result["green_pct"]
+
+
 if __name__ == "__main__":
     tests = [
         test_mask_is_center_touching_blob,
@@ -74,6 +90,7 @@ if __name__ == "__main__":
         test_no_mask_falls_back,
         test_banana_crop_shrinks_to_mask,
         test_green_banana_still_unripe,
+        test_same_color_background_does_not_flip_ripe,
     ]
     failed = 0
     for fn in tests:
