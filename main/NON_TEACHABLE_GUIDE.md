@@ -109,6 +109,7 @@ The ESP-32 sends a JSON payload:
 | Detection fallback | **Done** | 3-pass detection (YOLO → CLAHE enhanced → all-class fallback) |
 | Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) before HSV, so stand/crate/other-banana colors don't skew ripeness |
 | Adaptive detection | **Done** | Infer at 0.10 → relative score filter (max(best×0.30, 0.08)) → score-ordered NMS (IoU 0.5). UI has Auto mode (no floor) / Manual mode (threshold = floor) |
+| Blind-batch verification | **Done** | `main/blind_batch.py` — runs the live pipeline (auto mode) on the held-out Roboflow set (`main/models/Training`, 763 images, 3-class polygon labels: 0=overripe 1=ripe 2=underripe) and scores detection recall + ripeness agreement vs. the human labels. 20-image smoke report at `main/tests/blind_batch_report.md` (mean recall 66%, ripeness agreement 42%). Non-teachable — it *measures*, never trains. |
 
 ### Remaining
 

@@ -1,123 +1,105 @@
-# BananaRipeness — Fix Progress (as of 2026-07-07)
+# BananaRipeness — Progress (as of 2026-10-26)
 
-Two bugs being fixed, both **non-teachable** (OpenCV post-processing only, no retraining):
+## Reality check (what this repo actually is)
 
-1. **Background bleed** — ripeness color analysis read ALL pixels in the
-   detection box, so a green stand / yellow shelf next to the banana skewed
-   the answer.
-2. **Confidence picking** — one fixed threshold can't fit every image
-   (0.20 misses occluded bananas; 0.10 creates duplicate boxes on small bunches).
+The three plan docs (`progress.md`, `NON_TEACHABLE_GUIDE.md`, `learn/project-notes.md`)
+previously described a **341-image EfficientNet ripeness-classifier** workflow
+(`train.py`, `model_config.yaml`, `models/current/`, 97%/3% split). **None of
+that exists on disk or in git history.** The repo has since pivoted to a
+**fully non-teachable architecture** ("No models to train." — `app.py` caption):
+
+```
+YOLOv8n COCO (class 46=banana, generic — the fallback IS the production path)
+  → adaptive detection (0.10 infer → relative score filter → NMS)
+  → banana_mask.py  (center-touching connected-component body isolation)
+  → color_analyzer.py (HSV green/yellow/brown → unripe/ripe/semi-ripe/overripe)
+  → fusion_engine.py (gas + color → bunch verdict)
+```
+
+No `.pt` training, no `.h5` files anywhere. The old `classification/ripeness_classifier.py`
+is dead code (not imported by `app.py`; only poked by `test_pipeline.py` interface tests).
+
+**The ground-truth data that exists:** `main/models/Training` = 763-image Roboflow
+detection dataset ("Saba Banana Bunch"), split 609 train / 77 valid / 77 test,
+YOLO **polygon** labels, 3 ripeness classes per labeled banana object:
+
+| class index | name | labeled objects (all 763 images) |
+|---|---|---|
+| 0 | overripe | 287 |
+| 1 | ripe | 508 |
+| 2 | underripe | 757 |
+
+Median 2 labeled bananas per image (0–25). `valid/` + `test/` = **154 images**
+is the held-out set for verification (never used by anything, since nothing trains).
 
 ---
 
 ## Git state
 
-Clean tree. Rollback + work checkpoints:
+Branch: `blind-batch-verify` (off `main` @ `9c117df`).
 
-| Tag | Commit | Meaning |
-|-----|--------|---------|
-| `baseline-pre-fixes` | `df03b79` | **Original pre-fix code** — full rollback target |
-| `checkpoint/background-fix-wip` | `aee0571` | Latest state (all fixes in) |
-
-Commit history (newest first):
-```
-8f42880 docs: add design spec + implementation plan for banana fixes
-aee0571 fix: per-color-window center-component mask + center-core fallback
-c6542cf docs: record background-mask and adaptive-detection fixes
-26c03d5 feat: auto detection mode in UI (adaptive pipeline), manual as floor
-6384a4e feat: adaptive detection (low-conf inference + relative score filter + NMS dedup)
-8b985ca feat: background-resilient banana-mask ripeness analysis
-df03b79  ← original
-```
-
-Design + plan live in `docs/superpowers/specs/` and `docs/superpowers/plans/`.
-`learn/` is gitignored (local notes only).
+| What | Status |
+|---|---|
+| `main/blind_batch.py` (new) | Held-out batch runner: live pipeline vs. Training labels |
+| `main/tests/test_blind_batch.py` (new) | 12 unit tests — all passing |
+| `main/tests/blind_batch_report.md` | 20-image smoke-batch report |
+| All existing suites | `test_background_resilience` 6/6, `test_adaptive_detection` 5/5, `test_pipeline` 6/6, `test_bunch_logic` standalone — no regressions |
 
 ---
 
-## What's done (all committed)
+## Blind-batch — 20-image smoke results (2026-10-26)
 
-**Fix 1 — background mask** (`main/vision/banana_mask.py`, new):
-- Inside each box, per HSV color family (green/yellow/brown), keep only the
-  connected component that touches the box **center**, then union them. A
-  same-colored background forms a ring reaching the *edges*, not the center,
-  so it's dropped.
-- `color_analyzer.analyze_region` now counts green/yellow/brown over the
-  banana body only. New keys: `background_suppressed`, `pixel_counts.banana_pixels`.
-- Fallbacks: no clean mask → central 60% core; overexposed/white banana →
-  low-sat/high-value HSV window; all-background crop → legacy whole-box.
+Ran the **live pipeline** (auto/adaptive mode, conf 0.10 no floor, IoU≥0.3 match)
+on 20 held-out images (all 7 overripe-class images + 13 others, `valid/`+`test/`).
+Mapping: `unripe→underripe`; `semi-ripe` = acceptable 50/50 band between ripe/underripe.
 
-**Fix 2 — adaptive detection** (`main/detection/banana_detector.py`):
-- Pass 1 always infers at **0.10** (finds occluded bananas).
-- Relative filter: keep `score >= max(best × 0.30, 0.08)`.
-- Score-ordered NMS (IoU ≥ 0.50) removes duplicate boxes; `banana_id`
-  renumbered by confidence.
-- User threshold is now a **floor**, not a hard cutoff.
-- UI (`main/app.py`): **Auto** (default, conf 0.10, no floor) / **Manual** (slider = floor).
+| metric | value |
+|---|---|
+| images | 20 ok / 0 errored |
+| mean detection recall (19 labelled) | **66%** |
+| images with zero detections | 0 |
+| matched bananas | 26 |
+| ripeness agreement | **11/26 (42%)** |
+| spurious detections (no label overlap) | 63 |
 
-**Tests** (all passing):
-- `main/tests/test_background_resilience.py` — 6/6
-- `main/tests/test_adaptive_detection.py` — 5/5
-- `main/tests/test_pipeline.py` / `test_bunch_logic.py` — no regressions
+### Findings (both are non-teachable threshold work, not retraining)
 
-**E2E on the 5 real images** (auto mode, YOLOv8n COCO fallback):
-```
-1.png: 11 boxes  semi-ripe×3, ripe×8    mask_active 2/11   (market, was overcounting/unripe)
-2.png: 5 boxes   unripe×5               mask_active 2/5
-3.png: 7 boxes   unripe×7               mask_active 1/7
-4.png: 6 boxes   semi-ripe×1, unripe×5  mask_active 0/6
-5.png: 1 box     unripe×1               mask_active 1/1    ⚠ still reads UNRIPE
-```
+1. **Detector over-detects dense bunches** — `bunch_291`: 2 labels, 11 boxes;
+   `bunch_647`: 4 labels, 10 boxes. The relative score filter + NMS keeps
+   overlapping sub-bananas. 63 spurious boxes across 20 images.
+2. **`brown > 20%` over-calls OVERRIPE** on ripe bananas with brown spotting —
+   e.g. `bunch_101` label *ripe*: brown 99% → overripe; `bunch_432` label *ripe*:
+   brown 81.9%. 10 of 15 mismatches are overripe over-calls.
+3. **Yellow-heavy "underripe" labels read RIPE** — `bunch_79` (label underripe,
+   yellow 99.6%), `bunch_45` (yellow 99%). These are early-ripe yellow bananas the
+   labels call underripe: either label noise or the H-boundary (35) is too permissive.
+
+Per-image + confusion tables: `main/tests/blind_batch_report.md`.
 
 ---
 
-## ⚠ Open issue — image 5 (yellow banana on green background)
+## Next
 
-The mask is now **active** on image 5, but it still reads **UNRIPE**
-(green 99.8%, mean H≈53). Two possibilities to diagnose tomorrow:
-
-1. **The banana in this shot is genuinely unripe/green** — in which case
-   "UNRIPE" is *correct* and there's no bug. (Most likely — H=53 is in the
-   green band.)
-2. **It's a yellow banana and same-family background is still leaking
-   through** — a green stand connected to the center through the banana.
-   Color alone cannot separate two things in the *same* HSV family; that's
-   the documented limit of the color-only approach.
-
-This is the **hard case** (banana and background share a color family).
-Different-family cases (yellow banana / green stand) are fixed.
-
----
-
-## Tomorrow's plan
-
-1. **Diagnose image 5.** Dump the actual pixel values inside the box.
-   Decide: correct-unripe vs. same-family leak.
-   - If same-family leak → tighten: use box *center* weighting + size
-     prior (banana = largest center blob, background = larger edge ring),
-     or drop to the center-core path for single-banana boxes.
-2. **Validate the NMS/relative-filter constants** on image 1 (11 boxes —
-   confirm that's the true count, not missed/dup bananas). The constants
-   live as one-liners in `banana_detector.py`:
-   `ADAPTIVE_INFERENCE_CONF / RELATIVE_KEEP_RATIO / ABSOLUTE_FLOOR / NMS_IOU_THRESHOLD`.
-3. **Full-suite regression** before any release commit:
-   ```
-   cd main
-   python tests/test_background_resilience.py
-   python tests/test_adaptive_detection.py
-   python tests/test_bunch_logic.py
-   python tests/test_pipeline.py
-   ```
-4. **Manual UI check** — `streamlit run main/app.py`, confirm Auto/Manual
-   sidebar + annotated output look right on the 5 images.
-5. Only after that: consider `git tag checkpoint/final-verified`.
+1. **Scale the batch** — `python main/blind_batch.py --all` (154 images, ~15 min
+   on CPU; the smoke run was ~17 s total after the 8.7 s first-image torch warmup).
+   Read the aggregates before tuning anything.
+2. **Non-teachable threshold fixes** (rule-based, per `NON_TEACHABLE_GUIDE.md`):
+   - overripe over-call: demote `brown > 20%` when `yellow ≥ ~50%` (spotted-ripe
+     vs. rot-ripe distinction), or raise the brown floor;
+   - over-detection: tighten `RELATIVE_KEEP_RATIO` / `NMS_IOU_THRESHOLD`
+     against the 63 spurious boxes (measure first — full batch in step 1).
+3. **Manual UI spot-check** — `streamlit run main/app.py` on 3–4 images.
+4. Only after the above is clean: consider removing the dead
+   `classification/ripeness_classifier.py` + duplicate `main/bunch_analyzer.py`
+   (needs user sign-off — separate task).
 
 ## How to resume
 
 ```
 cd "D:\Pranjal Files\Capstone2026\BananaRipeness"
-git log --oneline -8          # see where we are
-git status                   # should be clean
+git log --oneline -6          # where we are
+python main/blind_batch.py --all     # the 154-image batch
+python main/tests/test_blind_batch.py  # 12 unit tests (or: python -m pytest main/tests/ -q)
 ```
-Read this file first. `baseline-pre-fixes` is your safety net if anything
-regresses.
+
+Read this file first. `main` @ `9c117df` is the safety net.
