@@ -3,5 +3,6 @@ numpy
 pillow
 streamlit
 ultralytics
+pandas
+pyserial
 tensorflow
-scikit-learn

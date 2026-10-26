@@ -1,105 +1,83 @@
 # BananaRipeness — Progress (as of 2026-10-26)
 
-## Reality check (what this repo actually is)
+## Where this version is (`main` @ `d00ffad` = GitHub)
 
-The three plan docs (`progress.md`, `NON_TEACHABLE_GUIDE.md`, `learn/project-notes.md`)
-previously described a **341-image EfficientNet ripeness-classifier** workflow
-(`train.py`, `model_config.yaml`, `models/current/`, 97%/3% split). **None of
-that exists on disk or in git history.** The repo has since pivoted to a
-**fully non-teachable architecture** ("No models to train." — `app.py` caption):
+Original non-teachable pipeline + verification tooling. Behavior summary:
 
 ```
-YOLOv8n COCO (class 46=banana, generic — the fallback IS the production path)
+YOLOv8n COCO (class 46=banana, pre-built fallback — the production path)
   → adaptive detection (0.10 infer → relative score filter → NMS)
   → banana_mask.py  (center-touching connected-component body isolation)
-  → color_analyzer.py (HSV green/yellow/brown → unripe/ripe/semi-ripe/overripe)
+  → color_analyzer.py (HSV; brown > 20% → overripe)
   → fusion_engine.py (gas + color → bunch verdict)
 ```
 
-No `.pt` training, no `.h5` files anywhere. The old `classification/ripeness_classifier.py`
-is dead code (not imported by `app.py`; only poked by `test_pipeline.py` interface tests).
+What this version does **not** include (measured fixes, kept on their branches):
 
-**The ground-truth data that exists:** `main/models/Training` = 763-image Roboflow
-detection dataset ("Saba Banana Bunch"), split 609 train / 77 valid / 77 test,
-YOLO **polygon** labels, 3 ripeness classes per labeled banana object:
+| Branch | Tip | What it adds | Measured effect (154-image batch) |
+|---|---|---|---|
+| `fix/overripe-gate` | `1c375aa` | `decide_ripeness` gate: overripe needs brown > 15% AND yellow ≤ 35% AND brown leading | agreement 20% → 53% |
+| `fix/green-background-mask` | `ec780d8` | gate + mask fix: no shrink-remask loop, coverage-qualified center rule, 2% floor (fixes yellow-banana-on-green-bg → UNRIPE) | 53% → 68% |
+| `fix/nested-box-removal` | `dfdbace` | drop any box that lies inside a bigger box (overlap rule) | not yet measured |
 
-| class index | name | labeled objects (all 763 images) |
-|---|---|---|
-| 0 | overripe | 287 |
-| 1 | ripe | 508 |
-| 2 | underripe | 757 |
+Known issues in THIS version (what those branches fix):
+- **Overripe over-calls** — `brown > 20%` fires on stained-ripe bananas (164/171 predicted-overripe wrong in the full batch).
+- **Green-background misread** — yellow banana on a solid green background reads UNRIPE (center-touching rule keeps the background; the old "image 5" open issue).
+- **Spurious/overlapping boxes** — 615 across the 154-image set; nested-box fragments survive NMS.
+- **Requirements** — `requirements.txt` now includes `pandas` (the app's per-banana table) and `pyserial` (ESP32 path); `scikit-learn` was unused.
 
-Median 2 labeled bananas per image (0–25). `valid/` + `test/` = **154 images**
-is the held-out set for verification (never used by anything, since nothing trains).
+## Reality check (what this repo actually is)
 
----
+Earlier plan docs described a 341-image EfficientNet training workflow — that never
+existed on disk or in git history. The repo is a fully non-teachable architecture
+("No models to train." — `app.py` caption). Ground truth for verification is
+`main/models/Training`: 763-image Roboflow detection set (609/77/77 split), YOLO
+polygon labels, 3 classes: 0=overripe (287 objects), 1=ripe (508), 2=underripe (757).
+`valid/`+`test/` = 154 held-out images; `blind_batch.py` measures the live pipeline
+against them. `classification/ripeness_classifier.py` is dead code (legacy, not
+imported by `app.py`). Six uploaded test images live at the repo root.
 
 ## Git state
 
-Branch: `blind-batch-verify` (off `main` @ `9c117df`).
-
-| What | Status |
+| Where | Commit |
 |---|---|
-| `main/blind_batch.py` (new) | Held-out batch runner: live pipeline vs. Training labels |
-| `main/tests/test_blind_batch.py` (new) | 12 unit tests — all passing |
-| `main/tests/blind_batch_report.md` | 20-image smoke-batch report |
-| All existing suites | `test_background_resilience` 6/6, `test_adaptive_detection` 5/5, `test_pipeline` 6/6, `test_bunch_logic` standalone — no regressions |
+| `main` (local **and** GitHub) | `d00ffad` — runner + smoke report + test images |
+| `main`'s parent | `4aa88a1` — blind-batch runner + tests |
+| GitHub `main` before this push | `df03b79` (pre-runner) |
 
----
+Test suites on this version: `test_blind_batch` 12, `test_background_resilience` 6,
+`test_adaptive_detection` 5, `test_pipeline` 6, `test_bunch_logic` standalone —
+29/29 via pytest + standalone, all green.
 
-## Blind-batch — 20-image smoke results (2026-10-26)
+## Blind-batch — 20-image smoke results (measured on this code)
 
-Ran the **live pipeline** (auto/adaptive mode, conf 0.10 no floor, IoU≥0.3 match)
-on 20 held-out images (all 7 overripe-class images + 13 others, `valid/`+`test/`).
-Mapping: `unripe→underripe`; `semi-ripe` = acceptable 50/50 band between ripe/underripe.
+Auto mode, IoU ≥ 0.3 matching, `unripe→underripe` mapping, `semi-ripe` = OK band:
 
 | metric | value |
 |---|---|
-| images | 20 ok / 0 errored |
-| mean detection recall (19 labelled) | **66%** |
-| images with zero detections | 0 |
-| matched bananas | 26 |
-| ripeness agreement | **11/26 (42%)** |
-| spurious detections (no label overlap) | 63 |
+| mean detection recall | 66% |
+| ripeness agreement | 11/26 (42%) |
+| spurious boxes | 63 |
 
-### Findings (both are non-teachable threshold work, not retraining)
-
-1. **Detector over-detects dense bunches** — `bunch_291`: 2 labels, 11 boxes;
-   `bunch_647`: 4 labels, 10 boxes. The relative score filter + NMS keeps
-   overlapping sub-bananas. 63 spurious boxes across 20 images.
-2. **`brown > 20%` over-calls OVERRIPE** on ripe bananas with brown spotting —
-   e.g. `bunch_101` label *ripe*: brown 99% → overripe; `bunch_432` label *ripe*:
-   brown 81.9%. 10 of 15 mismatches are overripe over-calls.
-3. **Yellow-heavy "underripe" labels read RIPE** — `bunch_79` (label underripe,
-   yellow 99.6%), `bunch_45` (yellow 99%). These are early-ripe yellow bananas the
-   labels call underripe: either label noise or the H-boundary (35) is too permissive.
-
+Full 154-image aggregates (measured before the gate/mask fixes): agreement 20%,
+615 spurious boxes — that's the "before" column for the branch table above.
 Per-image + confusion tables: `main/tests/blind_batch_report.md`.
-
----
 
 ## Next
 
-1. **Scale the batch** — `python main/blind_batch.py --all` (154 images, ~15 min
-   on CPU; the smoke run was ~17 s total after the 8.7 s first-image torch warmup).
-   Read the aggregates before tuning anything.
-2. **Non-teachable threshold fixes** (rule-based, per `NON_TEACHABLE_GUIDE.md`):
-   - overripe over-call: demote `brown > 20%` when `yellow ≥ ~50%` (spotted-ripe
-     vs. rot-ripe distinction), or raise the brown floor;
-   - over-detection: tighten `RELATIVE_KEEP_RATIO` / `NMS_IOU_THRESHOLD`
-     against the 63 spurious boxes (measure first — full batch in step 1).
-3. **Manual UI spot-check** — `streamlit run main/app.py` on 3–4 images.
-4. Only after the above is clean: consider removing the dead
-   `classification/ripeness_classifier.py` + duplicate `main/bunch_analyzer.py`
-   (needs user sign-off — separate task).
+1. **Decide which fixes to ship** — overripe gate, mask fix, and/or the
+   nested-box rule, one at a time, each measured with `python main/blind_batch.py --all`.
+2. **Manual UI spot-check** — `streamlit run main/app.py` with the 6 root test images
+   (note: expect the known overripe/green-bg misreads at this version).
+3. **Batch rerun after any fix** — regenerate the report, compare before/after.
+4. Optional cleanup: remove dead `classification/ripeness_classifier.py` +
+   duplicate `main/bunch_analyzer.py` (needs sign-off).
 
 ## How to resume
 
 ```
 cd "D:\Pranjal Files\Capstone2026\BananaRipeness"
-git log --oneline -6          # where we are
-python main/blind_batch.py --all     # the 154-image batch
-python main/tests/test_blind_batch.py  # 12 unit tests (or: python -m pytest main/tests/ -q)
+git log --oneline -4            # d00ffad = main = GitHub
+python main/blind_batch.py --all   # 154-image measurement (~4 min CPU)
+python -m pytest main/tests/ -q    # 29 tests
 ```
-
-Read this file first. `main` @ `9c117df` is the safety net.

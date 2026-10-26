@@ -366,17 +366,19 @@ Use: pyserial library
 ## Files
 
 ```
-app.py                            # Streamlit UI — entry point
-bunch_analyzer.py                 # Orchestrator: detection → analysis → fusion
-classification/ripeness_classifier.py  # Per-crop ripeness classification
-detection/banana_detector.py      # YOLOv8-based banana detection (to be replaced with contours)
-fusion/fusion_engine.py           # Sensor + color fusion → bunch verdict
-processing/bunch_analyzer.py      # Processing layer
-sensor/gas_reader.py              # DHT-11 reader (demo + serial modes)
-tests/test_bunch_logic.py         # Unit tests — bunch fusion logic
-tests/test_pipeline.py            # Integration tests — full pipeline
-utils/image_utils.py              # Crop, annotate, color conversion
-vision/color_analyzer.py          # HSV color segmentation + classification
+app.py                                    # Streamlit UI — entry point
+bunch_analyzer.py                         # Legacy orchestrator (duplicate of processing/)
+classification/ripeness_classifier.py     # LEGACY dead code — not used by app.py
+detection/banana_detector.py              # YOLOv8n (pre-built COCO, class 46) + adaptive filter + NMS
+blind_batch.py                            # Held-out verification runner vs. models/Training labels
+fusion/fusion_engine.py                   # Gas + color fusion → bunch verdict
+processing/bunch_analyzer.py              # Bunch-level aggregation
+sensor/gas_reader.py                      # DHT-11 / MQ-135 reader (demo + serial modes)
+tests/                                    # pytest suites + blind-batch reports
+utils/image_utils.py                      # Crop, annotate, color conversion
+vision/color_analyzer.py                  # HSV color segmentation + ripeness classes
+vision/banana_mask.py                     # Center-touching body mask (background suppression)
+models/Training/                          # 763-image Roboflow ground-truth dataset
 ```
 
 ---
@@ -388,10 +390,15 @@ opencv-python
 numpy
 pillow
 streamlit
-pyserial          # For ESP-32 serial communication
+ultralytics     # YOLOv8n pre-built COCO detector (inference only — never trained)
+pandas          # per-banana result table in the UI
+pyserial        # ESP-32 sensor communication (real-hardware mode)
+tensorflow      # legacy classifier only (dead code path)
 ```
 
-**No PyTorch. No TensorFlow. No ultralytics. No ML dependencies.**
+**No model training. No fine-tuning. No data augmentation pipeline.**
+The only "ML dependency" (ultralytics) runs a pre-built pre-trained detector;
+"non-teachable" = no learning loop, not no detector.
 
 ---
 
@@ -399,12 +406,19 @@ pyserial          # For ESP-32 serial communication
 
 ### Unit Tests
 
-| Module | Test Strategy |
+| Suite (run `python -m pytest main/tests/ -q`) | What it covers |
 |--------|---------------|
-| `color_analyzer` | Create synthetic images with known green/yellow/brown regions, verify percentages |
-| `gas_reader` | Demo mode returns values in expected range |
-| `fusion_engine` | All rule combinations: gas LOW/MODERATE/HIGH/CRITICAL x color unripe/ripe/overripe/semi-ripe |
-| `banana_detector` | Synthetic images with banana-shaped objects, verify contour detection |
+| `test_blind_batch.py` (12) | Label parsing, polygon→bbox, IoU matching, class mapping for the runner |
+| `test_background_resilience.py` (6) | Synthetic banana+background images: mask isolation, same-color background, green banana still unripe |
+| `test_adaptive_detection.py` (5) | Relative score filter + NMS dedup on crafted detections |
+| `test_pipeline.py` (6) | Full pipeline structure: detector loading, classifier interface, crop/annotate utilities, bunch logic |
+| `test_bunch_logic.py` (standalone) | BunchAnalyzer majority/scoring on mock results |
+
+### Verification (held-out batch)
+
+- `python main/blind_batch.py --limit 20` — smoke batch (deterministic pick, seed 42)
+- `python main/blind_batch.py --all` — every valid/+test/ image (154, ~4 min CPU)
+- Report: `main/tests/blind_batch_report.md` (smoke) / `blind_batch_report_full.md` (full, when generated)
 
 ### Integration Tests
 
