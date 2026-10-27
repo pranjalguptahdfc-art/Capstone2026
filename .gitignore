@@ -1,22 +1,43 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
 .venv/
 venv/
+env/
 .env
 
-# IDE
+# Testing & Quality
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Streamlit & Runtime
+.streamlit/
+*.log
+
+# IDE & Editors
 .idea/
 .vscode/
 *.swp
+*.swo
 
-# OS
+# OS specific
 Thumbs.db
 .DS_Store
+ehthumbs.db
+desktop.ini
 
-# Project-specific
+# Project-specific & Scratch
 learn/
 *.egg-info/
 dist/
 build/
+scratch/
+*.tmp
+
+# Output & Download artifacts
+annotated_*
+runs/
+output/

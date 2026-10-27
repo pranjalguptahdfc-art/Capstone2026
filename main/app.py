@@ -17,11 +17,14 @@ from vision.color_analyzer import analyze_batch, annotate_colors
 from fusion.fusion_engine import FusionEngine
 from sensor.gas_reader import GasReader, ETHYLENE_LOW, ETHYLENE_HIGH, ETHYLENE_CRITICAL
 from utils.image_utils import annotate_image, cv2_to_pil, pil_to_cv2
+from analytics_view import render_analytics_page
+from utils.analytics_store import log_inspection, compute_ripeness_metrics
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.set_page_config(page_title="Banana Bunch Ripeness Detector", page_icon="", layout="wide")
+st.set_page_config(page_title="Banana Ripeness & Quality Analytics", page_icon="🍌", layout="wide")
+
 
 CANONICAL_DISPLAY = {
     "unripe":     (" UNRIPE",   "#27ae60"),
@@ -60,7 +63,20 @@ def uploaded_file_to_bgr(uploaded_file):
 
 
 def main():
-    st.title(" Banana Bunch Ripeness Detector")
+    with st.sidebar:
+        st.markdown("## 🍌 Banana Vision AI")
+        page = st.radio(
+            "Navigation",
+            ["🍌 Ripeness Detector", "📊 Analytics"],
+            key="app_nav",
+        )
+        st.divider()
+
+    if page == "📊 Analytics":
+        render_analytics_page()
+        return
+
+    st.title("🍌 Banana Bunch Ripeness Detector")
     st.caption(
         "Detect a banana bunch, classify ripeness via color analysis, "
         "and compute the overall bunch status. No models to train."
@@ -179,8 +195,32 @@ def main():
     b_color = RISK_COLORS.get(b_status, "#7f8c8d")
     n_bananas = len(detections)
 
-    bcol1, bcol2, bcol3 = st.columns(3)
+    n_colors = len(color_analyses)
+    total_green = sum(a["green_pct"] for a in color_analyses) / n_colors if n_colors > 0 else 0
+    total_yellow = sum(a["yellow_pct"] for a in color_analyses) / n_colors if n_colors > 0 else 0
+    total_brown = sum(a["brown_pct"] for a in color_analyses) / n_colors if n_colors > 0 else 0
+
+    stage, avg_ripeness_pct, decision = compute_ripeness_metrics(
+        avg_green=total_green,
+        avg_yellow=total_yellow,
+        avg_brown=total_brown,
+        bunch_status=b_status,
+        color_signal=bunch.get("color_signal"),
+    )
+
+    dec_color = "#27ae60" if decision == "Approved" else "#e74c3c"
+    dec_icon = "✅" if decision == "Approved" else "❌"
+
+    bcol1, bcol2, bcol3, bcol4 = st.columns(4)
     bcol1.markdown(
+        f"<div style='text-align:center; padding:16px; border-radius:8px; "
+        f"background:{dec_color}15; border:2px solid {dec_color};'>"
+        f"<div style='font-size:12px; color:#666;'>DECISION</div>"
+        f"<div style='font-size:24px; font-weight:bold; color:{dec_color};'>{dec_icon} {decision.upper()}</div>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+    bcol2.markdown(
         f"<div style='text-align:center; padding:16px; border-radius:8px; "
         f"background:{b_color}15; border:2px solid {b_color};'>"
         f"<div style='font-size:12px; color:#666;'>STATUS</div>"
@@ -188,7 +228,7 @@ def main():
         f"</div>",
         unsafe_allow_html=True,
     )
-    bcol2.markdown(
+    bcol3.markdown(
         f"<div style='text-align:center; padding:16px; border-radius:8px; "
         f"background:#f8f9fa; border:2px solid #ddd;'>"
         f"<div style='font-size:12px; color:#666;'>BANANAS DETECTED</div>"
@@ -196,17 +236,45 @@ def main():
         f"</div>",
         unsafe_allow_html=True,
     )
-    conf_color = {"HIGH": "#27ae60", "MEDIUM": "#f39c12", "LOW": "#e74c3c"}.get(
-        bunch["confidence"], "#7f8c8d"
-    )
-    bcol3.markdown(
+    bcol4.markdown(
         f"<div style='text-align:center; padding:16px; border-radius:8px; "
-        f"background:{conf_color}15; border:2px solid {conf_color};'>"
-        f"<div style='font-size:12px; color:#666;'>CONFIDENCE</div>"
-        f"<div style='font-size:24px; font-weight:bold; color:{conf_color};'>{bunch['confidence']}</div>"
+        f"background:#fffbeb; border:2px solid #f59e0b;'>"
+        f"<div style='font-size:12px; color:#666;'>AVG RIPENESS</div>"
+        f"<div style='font-size:24px; font-weight:bold; color:#b45309;'>{avg_ripeness_pct}%</div>"
+        f"<div style='font-size:11px; color:#92400e; font-weight:600;'>{stage.upper()}</div>"
         f"</div>",
         unsafe_allow_html=True,
     )
+
+    # ── Automated logging to 30-day analytics store ────────────────────────
+    log_key = f"{uploaded.name}_{uploaded.size}_{n_bananas}_{b_status}_{avg_ripeness_pct}"
+    if st.session_state.get("last_logged_key") != log_key:
+        gas_ppm = gas_reading["ethylene_ppm"] if gas_reading else 0.0
+        log_inspection(
+            bunch_id=uploaded.name,
+            banana_count=n_bananas,
+            avg_green=total_green,
+            avg_yellow=total_yellow,
+            avg_brown=total_brown,
+            bunch_status=b_status,
+            confidence=bunch["confidence"],
+            dominant_problem=bunch["dominant_problem"],
+            reasoning=bunch["reasoning"],
+            gas_ppm=gas_ppm,
+            color_signal=bunch.get("color_signal"),
+        )
+        st.session_state["last_logged_key"] = log_key
+
+    log_c1, log_c2 = st.columns([3, 1])
+    with log_c1:
+        st.success(
+            f"✓ Inspection record timestamped & logged to 30-day analytics database! "
+            f"(Decision: **{decision}**, Stage: **{stage}**, Ripeness: **{avg_ripeness_pct}%**)"
+        )
+    with log_c2:
+        if st.button("📊 View Analytics", key="btn_goto_analytics"):
+            st.session_state["app_nav"] = "📊 Analytics"
+            st.rerun()
 
     st.info(f"**Reasoning:** {bunch['reasoning']}")
     st.markdown(f"**Dominant Problem:** {bunch['dominant_problem']}")
