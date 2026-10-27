@@ -1,0 +1,175 @@
+timestamp,bunch_id,banana_count,decision,bunch_status,ripeness_stage,avg_ripeness_pct,green_pct,yellow_pct,brown_pct,gas_ppm,confidence,dominant_problem,reasoning
+2026-09-27 09:57:08,bunch_20260927_005,11,Approved,ACCEPTABLE,Ripe,69.7,5.1,71.2,8.4,0.81,HIGH,No significant problems,Mostly yellow (71.2%) - ripe and stable.
+2026-09-27 10:13:16,bunch_20260927_006,9,Approved,ACCEPTABLE,Ripe,77.8,6.1,82.9,6.5,0.75,HIGH,No significant problems,Mostly yellow (82.9%) - ripe and stable.
+2026-09-27 13:43:24,bunch_20260927_003,6,Approved,ACCEPTABLE,Ripe,73.7,3.8,81.5,3.9,0.57,HIGH,No significant problems,Mostly yellow (81.5%) - ripe and stable.
+2026-09-27 13:52:01,bunch_20260927_002,13,Approved,SEMI-RIPE,Semi-ripe,60.0,25.0,56.8,7.9,1.23,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-27 14:51:56,bunch_20260927_004,15,Approved,ACCEPTABLE,Ripe,71.1,4.2,81.4,1.2,1.15,HIGH,No significant problems,Mostly yellow (81.4%) - ripe and stable.
+2026-09-27 15:20:38,bunch_20260927_001,6,Approved,ACCEPTABLE,Ripe,63.1,8.0,67.7,4.3,0.34,HIGH,No significant problems,Mostly yellow (67.7%) - ripe and stable.
+2026-09-28 08:24:06,bunch_20260928_003,11,Approved,ACCEPTABLE,Ripe,65.8,5.8,75.7,0.7,0.4,HIGH,No significant problems,Mostly yellow (75.7%) - ripe and stable.
+2026-09-28 08:34:36,bunch_20260928_006,13,Denied,HIGH RISK,Overripe,91.1,1.9,58.0,41.5,5.11,MEDIUM,High brown spotting (41.5%),Overripe bananas (41.5% brown) - approaching spoilage.
+2026-09-28 09:25:43,bunch_20260928_001,12,Denied,HIGH RISK,Overripe,90.4,7.4,54.9,42.6,4.06,MEDIUM,High brown spotting (42.6%),Overripe bananas (42.6% brown) - approaching spoilage.
+2026-09-28 09:32:47,bunch_20260928_005,6,Approved,ACCEPTABLE,Ripe,79.5,10.7,83.1,7.3,0.47,HIGH,No significant problems,Mostly yellow (83.1%) - ripe and stable.
+2026-09-28 10:34:32,bunch_20260928_004,15,Approved,SEMI-RIPE,Semi-ripe,61.4,40.0,56.5,7.4,1.58,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-28 15:20:15,bunch_20260928_002,12,Approved,SEMI-RIPE,Semi-ripe,55.0,38.5,48.8,7.8,1.21,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-28 17:59:12,bunch_20260928_007,8,Approved,ACCEPTABLE,Ripe,84.0,8.2,89.2,7.0,0.9,HIGH,No significant problems,Mostly yellow (89.2%) - ripe and stable.
+2026-09-29 08:58:48,bunch_20260929_006,8,Denied,HIGH RISK,Overripe,66.6,2.8,40.8,31.5,7.5,HIGH,High brown spotting (31.5%),Overripe bananas (31.5% brown) - approaching spoilage.
+2026-09-29 11:12:31,bunch_20260929_001,8,Approved,ACCEPTABLE,Ripe,80.9,13.4,83.8,7.7,0.5,HIGH,No significant problems,Mostly yellow (83.8%) - ripe and stable.
+2026-09-29 11:48:48,bunch_20260929_005,11,Approved,ACCEPTABLE,Ripe,71.3,11.1,71.7,8.7,0.35,HIGH,No significant problems,Mostly yellow (71.7%) - ripe and stable.
+2026-09-29 13:27:27,bunch_20260929_002,12,Approved,ACCEPTABLE,Ripe,71.1,13.5,76.2,4.2,0.32,HIGH,No significant problems,Mostly yellow (76.2%) - ripe and stable.
+2026-09-29 14:32:00,bunch_20260929_003,11,Approved,ACCEPTABLE,Ripe,77.3,12.6,76.5,10.4,0.21,HIGH,No significant problems,Mostly yellow (76.5%) - ripe and stable.
+2026-09-29 16:36:32,bunch_20260929_004,12,Approved,ACCEPTABLE,Ripe,69.4,14.3,74.1,4.2,0.72,HIGH,No significant problems,Mostly yellow (74.1%) - ripe and stable.
+2026-09-29 17:31:05,bunch_20260929_007,11,Approved,ACCEPTABLE,Ripe,75.7,11.9,83.1,3.2,0.93,HIGH,No significant problems,Mostly yellow (83.1%) - ripe and stable.
+2026-09-30 08:39:38,bunch_20260930_003,6,Denied,HIGH RISK,Overripe,66.5,0.9,48.5,25.2,9.33,HIGH,High brown spotting (25.2%),Overripe bananas (25.2% brown) - approaching spoilage.
+2026-09-30 11:33:05,bunch_20260930_001,6,Approved,ACCEPTABLE,Ripe,78.1,12.4,87.0,2.2,0.71,HIGH,No significant problems,Mostly yellow (87.0%) - ripe and stable.
+2026-09-30 11:59:58,bunch_20260930_002,12,Approved,ACCEPTABLE,Ripe,78.0,12.5,84.2,4.5,0.3,HIGH,No significant problems,Mostly yellow (84.2%) - ripe and stable.
+2026-09-30 12:36:31,bunch_20260930_005,11,Approved,SEMI-RIPE,Semi-ripe,49.1,33.0,44.8,6.1,1.65,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-30 13:55:32,bunch_20260930_006,6,Approved,SEMI-RIPE,Semi-ripe,45.3,28.7,39.7,7.3,1.21,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-30 14:59:15,bunch_20260930_004,15,Approved,SEMI-RIPE,Semi-ripe,50.0,37.2,49.1,2.7,0.44,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-09-30 16:34:24,bunch_20260930_007,12,Approved,ACCEPTABLE,Ripe,68.8,9.1,69.3,8.5,0.85,HIGH,No significant problems,Mostly yellow (69.3%) - ripe and stable.
+2026-10-01 08:03:32,bunch_20261001_001,4,Approved,ACCEPTABLE,Ripe,69.4,6.8,69.8,9.1,0.92,HIGH,No significant problems,Mostly yellow (69.8%) - ripe and stable.
+2026-10-01 09:20:29,bunch_20261001_003,7,Approved,SEMI-RIPE,Semi-ripe,53.0,44.9,51.4,2.6,1.05,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-01 10:21:54,bunch_20261001_002,14,Approved,ACCEPTABLE,Ripe,77.1,14.7,80.9,6.1,1.11,HIGH,No significant problems,Mostly yellow (80.9%) - ripe and stable.
+2026-10-01 10:48:16,bunch_20261001_004,4,Denied,HIGH RISK,Overripe,73.8,7.1,47.0,32.8,8.21,HIGH,High brown spotting (32.8%),Overripe bananas (32.8% brown) - approaching spoilage.
+2026-10-01 12:30:34,bunch_20261001_005,5,Denied,HIGH RISK,Overripe,64.5,1.5,47.6,23.7,5.19,HIGH,Ethylene spike detected,Ethylene level (5.2 ppm) exceeds safe threshold.
+2026-10-01 16:41:30,bunch_20261001_006,10,Approved,ACCEPTABLE,Unripe,21.8,86.4,9.2,1.0,0.44,HIGH,Mostly unripe,Green bunch (86.4%) - optimal for long-distance transit.
+2026-10-02 10:24:57,bunch_20261002_004,9,Approved,ACCEPTABLE,Ripe,64.1,9.7,72.7,0.9,0.24,HIGH,No significant problems,Mostly yellow (72.7%) - ripe and stable.
+2026-10-02 15:45:15,bunch_20261002_003,9,Approved,ACCEPTABLE,Ripe,83.1,2.4,88.9,7.2,0.64,HIGH,No significant problems,Mostly yellow (88.9%) - ripe and stable.
+2026-10-02 17:01:25,bunch_20261002_001,10,Approved,SEMI-RIPE,Semi-ripe,53.8,41.2,51.9,3.5,0.74,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-02 17:34:49,bunch_20261002_002,4,Approved,ACCEPTABLE,Unripe,29.6,86.0,16.7,2.5,0.5,HIGH,Mostly unripe,Green bunch (86.0%) - optimal for long-distance transit.
+2026-10-03 10:54:39,bunch_20261003_002,6,Approved,SEMI-RIPE,Semi-ripe,57.7,36.9,57.5,3.3,1.49,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-03 12:21:28,bunch_20261003_005,15,Approved,ACCEPTABLE,Ripe,71.1,6.6,71.7,9.2,0.21,HIGH,No significant problems,Mostly yellow (71.7%) - ripe and stable.
+2026-10-03 12:32:07,bunch_20261003_001,7,Approved,SEMI-RIPE,Semi-ripe,43.5,39.3,42.3,1.6,0.38,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-03 17:00:46,bunch_20261003_004,10,Approved,ACCEPTABLE,Ripe,77.6,11.3,79.8,8.1,0.48,HIGH,No significant problems,Mostly yellow (79.8%) - ripe and stable.
+2026-10-03 17:54:25,bunch_20261003_003,13,Approved,ACCEPTABLE,Ripe,87.8,12.9,91.0,8.5,0.61,HIGH,No significant problems,Mostly yellow (91.0%) - ripe and stable.
+2026-10-04 08:29:45,bunch_20261004_001,8,Denied,HIGH RISK,Overripe,61.3,6.1,40.4,26.0,8.58,HIGH,High brown spotting (26.0%),Overripe bananas (26.0% brown) - approaching spoilage.
+2026-10-04 08:39:09,bunch_20261004_005,5,Approved,ACCEPTABLE,Ripe,67.1,4.8,72.4,4.8,0.24,HIGH,No significant problems,Mostly yellow (72.4%) - ripe and stable.
+2026-10-04 10:22:16,bunch_20261004_006,10,Approved,SEMI-RIPE,Semi-ripe,48.3,40.7,45.7,3.4,0.69,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-04 11:57:52,bunch_20261004_007,7,Approved,ACCEPTABLE,Ripe,82.4,2.5,90.3,5.3,1.17,HIGH,No significant problems,Mostly yellow (90.3%) - ripe and stable.
+2026-10-04 12:44:03,bunch_20261004_003,7,Approved,SEMI-RIPE,Semi-ripe,62.4,46.7,56.9,7.1,1.25,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-04 14:57:09,bunch_20261004_002,11,Denied,HIGH RISK,Overripe,82.0,0.1,46.5,42.4,9.38,HIGH,High brown spotting (42.4%),Overripe bananas (42.4% brown) - approaching spoilage.
+2026-10-04 15:11:49,bunch_20261004_004,4,Approved,ACCEPTABLE,Ripe,70.0,12.5,68.5,9.9,0.83,HIGH,No significant problems,Mostly yellow (68.5%) - ripe and stable.
+2026-10-05 11:47:24,bunch_20261005_003,15,Approved,ACCEPTABLE,Ripe,77.5,7.1,89.2,0.6,1.11,HIGH,No significant problems,Mostly yellow (89.2%) - ripe and stable.
+2026-10-05 12:08:23,bunch_20261005_001,11,Approved,SEMI-RIPE,Semi-ripe,57.9,34.5,57.8,3.6,1.46,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-05 14:31:36,bunch_20261005_002,4,Approved,ACCEPTABLE,Ripe,75.8,11.6,83.4,3.2,0.58,HIGH,No significant problems,Mostly yellow (83.4%) - ripe and stable.
+2026-10-05 16:06:27,bunch_20261005_004,12,Denied,HIGH RISK,Overripe,90.8,5.1,54.3,43.9,6.33,MEDIUM,High brown spotting (43.9%),Overripe bananas (43.9% brown) - approaching spoilage.
+2026-10-06 10:44:12,bunch_20261006_006,10,Approved,ACCEPTABLE,Ripe,79.4,11.6,80.4,9.3,1.02,HIGH,No significant problems,Mostly yellow (80.4%) - ripe and stable.
+2026-10-06 11:05:59,bunch_20261006_005,10,Approved,ACCEPTABLE,Ripe,79.9,9.3,86.0,5.4,1.11,HIGH,No significant problems,Mostly yellow (86.0%) - ripe and stable.
+2026-10-06 12:34:22,bunch_20261006_002,4,Approved,ACCEPTABLE,Ripe,82.1,14.6,84.1,8.4,1.04,HIGH,No significant problems,Mostly yellow (84.1%) - ripe and stable.
+2026-10-06 12:35:52,bunch_20261006_001,13,Approved,SEMI-RIPE,Semi-ripe,54.2,27.1,53.8,4.5,0.39,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-06 13:06:45,bunch_20261006_003,8,Approved,SEMI-RIPE,Semi-ripe,46.1,43.9,39.5,5.9,0.42,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-06 13:18:07,bunch_20261006_004,7,Approved,ACCEPTABLE,Ripe,77.0,12.6,75.0,11.4,1.19,HIGH,No significant problems,Mostly yellow (75.0%) - ripe and stable.
+2026-10-07 08:52:53,bunch_20261007_003,11,Approved,ACCEPTABLE,Ripe,80.1,2.6,89.3,3.7,1.15,HIGH,No significant problems,Mostly yellow (89.3%) - ripe and stable.
+2026-10-07 10:12:27,bunch_20261007_001,15,Denied,HIGH RISK,Overripe,71.7,6.9,47.1,30.6,4.91,HIGH,High brown spotting (30.6%),Overripe bananas (30.6% brown) - approaching spoilage.
+2026-10-07 12:15:53,bunch_20261007_002,4,Denied,HIGH RISK,Overripe,83.4,5.6,46.3,43.1,3.98,MEDIUM,High brown spotting (43.1%),Overripe bananas (43.1% brown) - approaching spoilage.
+2026-10-08 12:40:35,bunch_20261008_002,6,Denied,HIGH RISK,Overripe,83.8,2.5,53.4,38.1,8.63,HIGH,High brown spotting (38.1%),Overripe bananas (38.1% brown) - approaching spoilage.
+2026-10-08 13:17:50,bunch_20261008_003,8,Approved,SEMI-RIPE,Semi-ripe,55.5,34.6,50.3,7.5,1.6,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-08 13:27:16,bunch_20261008_006,13,Approved,ACCEPTABLE,Ripe,81.8,13.9,85.2,7.2,0.93,HIGH,No significant problems,Mostly yellow (85.2%) - ripe and stable.
+2026-10-08 13:58:26,bunch_20261008_005,10,Approved,ACCEPTABLE,Ripe,59.1,2.5,66.7,2.0,0.21,HIGH,No significant problems,Mostly yellow (66.7%) - ripe and stable.
+2026-10-08 14:55:32,bunch_20261008_004,12,Approved,SEMI-RIPE,Semi-ripe,51.3,47.7,47.6,3.6,1.42,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-08 15:27:52,bunch_20261008_001,15,Approved,ACCEPTABLE,Ripe,65.3,8.0,70.1,4.6,0.78,HIGH,No significant problems,Mostly yellow (70.1%) - ripe and stable.
+2026-10-09 09:11:00,bunch_20261009_003,10,Approved,ACCEPTABLE,Ripe,75.3,13.4,80.1,5.1,0.33,HIGH,No significant problems,Mostly yellow (80.1%) - ripe and stable.
+2026-10-09 10:16:20,bunch_20261009_001,4,Approved,ACCEPTABLE,Ripe,67.8,14.4,68.5,7.5,0.43,HIGH,No significant problems,Mostly yellow (68.5%) - ripe and stable.
+2026-10-09 12:20:13,bunch_20261009_004,5,Approved,SEMI-RIPE,Semi-ripe,41.2,28.1,42.3,1.1,0.83,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-09 15:31:33,bunch_20261009_002,14,Approved,ACCEPTABLE,Ripe,65.9,10.7,68.1,6.5,0.97,HIGH,No significant problems,Mostly yellow (68.1%) - ripe and stable.
+2026-10-10 10:33:51,bunch_20261010_001,4,Approved,ACCEPTABLE,Ripe,71.6,13.8,77.2,3.9,0.72,HIGH,No significant problems,Mostly yellow (77.2%) - ripe and stable.
+2026-10-10 12:01:12,bunch_20261010_003,14,Approved,ACCEPTABLE,Ripe,76.2,6.4,80.7,6.7,0.66,HIGH,No significant problems,Mostly yellow (80.7%) - ripe and stable.
+2026-10-10 12:28:03,bunch_20261010_002,9,Approved,ACCEPTABLE,Ripe,77.6,12.0,87.7,1.3,0.25,HIGH,No significant problems,Mostly yellow (87.7%) - ripe and stable.
+2026-10-10 13:15:07,bunch_20261010_004,5,Approved,ACCEPTABLE,Ripe,82.9,7.4,83.8,10.6,0.72,HIGH,No significant problems,Mostly yellow (83.8%) - ripe and stable.
+2026-10-11 10:51:14,bunch_20261011_004,5,Approved,ACCEPTABLE,Ripe,86.5,5.1,89.9,9.2,0.73,HIGH,No significant problems,Mostly yellow (89.9%) - ripe and stable.
+2026-10-11 13:46:55,bunch_20261011_003,4,Approved,ACCEPTABLE,Unripe,22.0,86.2,9.0,1.4,0.5,HIGH,Mostly unripe,Green bunch (86.2%) - optimal for long-distance transit.
+2026-10-11 14:21:25,bunch_20261011_007,12,Approved,ACCEPTABLE,Ripe,67.5,6.5,71.3,6.0,0.56,HIGH,No significant problems,Mostly yellow (71.3%) - ripe and stable.
+2026-10-11 16:11:25,bunch_20261011_002,12,Approved,ACCEPTABLE,Unripe,23.4,68.0,13.6,1.6,0.15,HIGH,Mostly unripe,Green bunch (68.0%) - optimal for long-distance transit.
+2026-10-11 17:13:58,bunch_20261011_005,5,Approved,ACCEPTABLE,Ripe,80.1,13.6,84.3,6.4,0.73,HIGH,No significant problems,Mostly yellow (84.3%) - ripe and stable.
+2026-10-11 17:37:34,bunch_20261011_006,4,Approved,ACCEPTABLE,Ripe,62.0,11.6,67.8,2.6,0.76,HIGH,No significant problems,Mostly yellow (67.8%) - ripe and stable.
+2026-10-11 17:50:18,bunch_20261011_001,8,Approved,ACCEPTABLE,Unripe,22.9,72.9,13.9,0.2,0.37,HIGH,Mostly unripe,Green bunch (72.9%) - optimal for long-distance transit.
+2026-10-12 08:25:13,bunch_20261012_007,4,Approved,ACCEPTABLE,Ripe,75.2,4.0,80.7,6.0,0.73,HIGH,No significant problems,Mostly yellow (80.7%) - ripe and stable.
+2026-10-12 09:46:35,bunch_20261012_001,12,Approved,ACCEPTABLE,Ripe,75.9,11.7,80.8,5.5,0.33,HIGH,No significant problems,Mostly yellow (80.8%) - ripe and stable.
+2026-10-12 10:44:43,bunch_20261012_006,15,Approved,ACCEPTABLE,Ripe,81.9,11.2,91.1,2.8,0.94,HIGH,No significant problems,Mostly yellow (91.1%) - ripe and stable.
+2026-10-12 11:14:05,bunch_20261012_005,13,Denied,HIGH RISK,Overripe,83.6,6.6,58.1,33.3,8.03,HIGH,High brown spotting (33.3%),Overripe bananas (33.3% brown) - approaching spoilage.
+2026-10-12 12:05:51,bunch_20261012_002,4,Approved,SEMI-RIPE,Semi-ripe,54.9,33.2,49.4,7.9,1.21,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-12 12:21:20,bunch_20261012_003,11,Approved,ACCEPTABLE,Ripe,64.2,4.1,71.6,2.6,0.49,HIGH,No significant problems,Mostly yellow (71.6%) - ripe and stable.
+2026-10-12 14:08:54,bunch_20261012_004,7,Approved,ACCEPTABLE,Ripe,69.3,11.1,65.5,12.0,1.1,HIGH,No significant problems,Mostly yellow (65.5%) - ripe and stable.
+2026-10-13 09:13:52,bunch_20261013_003,9,Approved,SEMI-RIPE,Semi-ripe,54.1,29.2,56.8,1.5,1.41,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-13 15:09:04,bunch_20261013_001,8,Approved,ACCEPTABLE,Ripe,88.7,6.2,91.7,9.8,0.45,HIGH,No significant problems,Mostly yellow (91.7%) - ripe and stable.
+2026-10-13 15:10:40,bunch_20261013_004,13,Approved,SEMI-RIPE,Semi-ripe,54.8,44.0,54.0,2.3,0.65,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-13 16:16:08,bunch_20261013_002,15,Approved,ACCEPTABLE,Ripe,71.7,7.4,77.7,4.5,1.13,HIGH,No significant problems,Mostly yellow (77.7%) - ripe and stable.
+2026-10-14 08:22:14,bunch_20261014_002,11,Approved,ACCEPTABLE,Ripe,71.1,7.1,74.6,6.6,0.27,HIGH,No significant problems,Mostly yellow (74.6%) - ripe and stable.
+2026-10-14 10:38:50,bunch_20261014_003,4,Approved,ACCEPTABLE,Ripe,73.1,11.5,74.0,8.5,0.37,HIGH,No significant problems,Mostly yellow (74.0%) - ripe and stable.
+2026-10-14 11:21:01,bunch_20261014_005,7,Approved,SEMI-RIPE,Semi-ripe,58.9,32.9,55.5,6.7,0.47,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-14 11:29:38,bunch_20261014_004,4,Approved,ACCEPTABLE,Ripe,88.5,11.8,91.9,8.6,0.98,HIGH,No significant problems,Mostly yellow (91.9%) - ripe and stable.
+2026-10-14 15:51:55,bunch_20261014_006,14,Approved,ACCEPTABLE,Ripe,74.1,8.3,79.6,5.2,0.97,HIGH,No significant problems,Mostly yellow (79.6%) - ripe and stable.
+2026-10-14 16:44:41,bunch_20261014_001,9,Approved,ACCEPTABLE,Ripe,80.0,7.7,87.0,4.8,0.66,HIGH,No significant problems,Mostly yellow (87.0%) - ripe and stable.
+2026-10-15 10:35:35,bunch_20261015_001,9,Approved,SEMI-RIPE,Semi-ripe,56.8,44.0,50.0,7.7,0.81,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-15 12:25:45,bunch_20261015_005,8,Approved,ACCEPTABLE,Ripe,79.5,6.3,87.6,4.1,0.43,HIGH,No significant problems,Mostly yellow (87.6%) - ripe and stable.
+2026-10-15 15:22:46,bunch_20261015_002,4,Approved,ACCEPTABLE,Ripe,73.5,13.9,81.6,2.1,0.3,HIGH,No significant problems,Mostly yellow (81.6%) - ripe and stable.
+2026-10-15 15:59:42,bunch_20261015_003,15,Denied,HIGH RISK,Overripe,84.9,7.4,57.4,35.0,7.96,MEDIUM,High brown spotting (35.0%),Overripe bananas (35.0% brown) - approaching spoilage.
+2026-10-15 17:08:53,bunch_20261015_004,8,Approved,ACCEPTABLE,Ripe,70.6,12.9,67.8,11.0,0.32,HIGH,No significant problems,Mostly yellow (67.8%) - ripe and stable.
+2026-10-16 12:08:09,bunch_20261016_001,14,Approved,SEMI-RIPE,Semi-ripe,41.1,32.7,38.1,3.8,1.11,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-16 13:01:06,bunch_20261016_002,6,Approved,ACCEPTABLE,Ripe,76.4,7.9,84.9,3.1,0.65,HIGH,No significant problems,Mostly yellow (84.9%) - ripe and stable.
+2026-10-16 13:23:24,bunch_20261016_003,9,Approved,ACCEPTABLE,Ripe,71.6,13.9,76.3,4.7,0.78,HIGH,No significant problems,Mostly yellow (76.3%) - ripe and stable.
+2026-10-17 08:06:00,bunch_20261017_002,4,Approved,ACCEPTABLE,Ripe,75.2,7.5,75.7,9.7,0.55,HIGH,No significant problems,Mostly yellow (75.7%) - ripe and stable.
+2026-10-17 09:20:48,bunch_20261017_001,11,Approved,ACCEPTABLE,Ripe,83.2,3.9,90.9,5.3,0.29,HIGH,No significant problems,Mostly yellow (90.9%) - ripe and stable.
+2026-10-17 10:03:00,bunch_20261017_004,5,Approved,ACCEPTABLE,Ripe,62.4,11.8,67.0,3.6,1.1,HIGH,No significant problems,Mostly yellow (67.0%) - ripe and stable.
+2026-10-17 15:18:17,bunch_20261017_003,9,Approved,ACCEPTABLE,Ripe,79.6,8.9,84.3,6.6,0.68,HIGH,No significant problems,Mostly yellow (84.3%) - ripe and stable.
+2026-10-18 08:22:54,bunch_20261018_001,11,Approved,ACCEPTABLE,Ripe,74.1,10.6,84.3,0.8,0.42,HIGH,No significant problems,Mostly yellow (84.3%) - ripe and stable.
+2026-10-18 09:01:00,bunch_20261018_005,15,Approved,SEMI-RIPE,Semi-ripe,46.4,31.0,44.8,3.7,1.19,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-18 10:31:23,bunch_20261018_003,8,Approved,SEMI-RIPE,Semi-ripe,57.2,44.1,55.1,3.8,1.3,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-18 11:04:36,bunch_20261018_006,9,Approved,ACCEPTABLE,Ripe,73.0,7.7,79.9,3.9,1.15,HIGH,No significant problems,Mostly yellow (79.9%) - ripe and stable.
+2026-10-18 14:47:17,bunch_20261018_004,7,Approved,ACCEPTABLE,Ripe,58.7,4.7,67.3,0.8,0.38,HIGH,No significant problems,Mostly yellow (67.3%) - ripe and stable.
+2026-10-18 14:58:07,bunch_20261018_002,5,Approved,ACCEPTABLE,Ripe,82.3,4.3,86.6,8.0,0.44,HIGH,No significant problems,Mostly yellow (86.6%) - ripe and stable.
+2026-10-19 09:22:36,bunch_20261019_003,4,Approved,ACCEPTABLE,Ripe,83.9,3.5,89.7,7.1,0.47,HIGH,No significant problems,Mostly yellow (89.7%) - ripe and stable.
+2026-10-19 09:59:53,bunch_20261019_006,11,Approved,SEMI-RIPE,Semi-ripe,42.3,38.9,39.7,2.7,0.88,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-19 12:24:37,bunch_20261019_004,9,Approved,ACCEPTABLE,Unripe,18.1,69.7,8.2,0.7,0.55,HIGH,Mostly unripe,Green bunch (69.7%) - optimal for long-distance transit.
+2026-10-19 15:16:09,bunch_20261019_001,4,Approved,ACCEPTABLE,Ripe,81.7,8.1,91.6,2.6,0.68,HIGH,No significant problems,Mostly yellow (91.6%) - ripe and stable.
+2026-10-19 15:33:11,bunch_20261019_005,13,Approved,SEMI-RIPE,Semi-ripe,53.3,38.2,47.9,6.9,0.91,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-19 16:39:01,bunch_20261019_002,13,Approved,SEMI-RIPE,Semi-ripe,47.8,28.2,43.2,6.8,1.78,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-20 09:08:25,bunch_20261020_003,11,Approved,ACCEPTABLE,Ripe,69.4,6.6,74.3,5.2,0.9,HIGH,No significant problems,Mostly yellow (74.3%) - ripe and stable.
+2026-10-20 10:36:43,bunch_20261020_005,15,Approved,SEMI-RIPE,Semi-ripe,61.0,43.2,57.2,5.8,1.08,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-20 11:48:58,bunch_20261020_001,8,Approved,ACCEPTABLE,Ripe,77.6,8.2,80.3,8.1,1.14,HIGH,No significant problems,Mostly yellow (80.3%) - ripe and stable.
+2026-10-20 15:32:57,bunch_20261020_002,14,Approved,ACCEPTABLE,Ripe,63.8,9.7,72.1,1.1,0.7,HIGH,No significant problems,Mostly yellow (72.1%) - ripe and stable.
+2026-10-20 17:24:38,bunch_20261020_004,15,Approved,ACCEPTABLE,Ripe,69.0,2.0,67.1,11.6,0.21,HIGH,No significant problems,Mostly yellow (67.1%) - ripe and stable.
+2026-10-21 09:02:36,bunch_20261021_005,7,Approved,ACCEPTABLE,Ripe,73.5,7.3,76.9,7.1,1.0,HIGH,No significant problems,Mostly yellow (76.9%) - ripe and stable.
+2026-10-21 11:38:34,bunch_20261021_004,15,Approved,ACCEPTABLE,Ripe,82.0,2.5,87.4,7.4,0.43,HIGH,No significant problems,Mostly yellow (87.4%) - ripe and stable.
+2026-10-21 15:30:20,bunch_20261021_001,15,Approved,SEMI-RIPE,Semi-ripe,58.4,39.7,52.5,7.9,1.66,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-21 17:06:13,bunch_20261021_003,5,Approved,ACCEPTABLE,Ripe,74.5,4.5,84.7,1.8,0.62,HIGH,No significant problems,Mostly yellow (84.7%) - ripe and stable.
+2026-10-21 17:40:44,bunch_20261021_002,9,Approved,SEMI-RIPE,Semi-ripe,46.8,38.5,38.9,8.0,1.13,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-22 08:28:52,bunch_20261022_003,10,Approved,ACCEPTABLE,Ripe,74.5,5.5,80.7,5.1,0.29,HIGH,No significant problems,Mostly yellow (80.7%) - ripe and stable.
+2026-10-22 09:29:58,bunch_20261022_002,7,Approved,ACCEPTABLE,Unripe,35.9,77.2,24.0,4.0,0.6,HIGH,Mostly unripe,Green bunch (77.2%) - optimal for long-distance transit.
+2026-10-22 11:04:00,bunch_20261022_004,8,Approved,ACCEPTABLE,Ripe,62.6,6.6,68.0,3.8,0.5,HIGH,No significant problems,Mostly yellow (68.0%) - ripe and stable.
+2026-10-22 13:24:12,bunch_20261022_001,13,Approved,SEMI-RIPE,Semi-ripe,55.9,39.2,55.7,2.6,0.34,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-22 16:06:51,bunch_20261022_007,13,Approved,ACCEPTABLE,Ripe,69.6,12.9,75.8,3.2,1.03,HIGH,No significant problems,Mostly yellow (75.8%) - ripe and stable.
+2026-10-22 16:47:00,bunch_20261022_005,14,Approved,ACCEPTABLE,Unripe,20.2,66.0,9.9,2.0,0.16,HIGH,Mostly unripe,Green bunch (66.0%) - optimal for long-distance transit.
+2026-10-22 17:36:36,bunch_20261022_006,5,Approved,ACCEPTABLE,Ripe,78.2,13.4,76.3,11.4,0.67,HIGH,No significant problems,Mostly yellow (76.3%) - ripe and stable.
+2026-10-23 08:08:34,bunch_20261023_002,4,Approved,ACCEPTABLE,Ripe,74.5,5.4,79.2,6.4,0.69,HIGH,No significant problems,Mostly yellow (79.2%) - ripe and stable.
+2026-10-23 09:10:40,bunch_20261023_004,13,Approved,ACCEPTABLE,Ripe,63.8,8.2,72.4,1.0,1.05,HIGH,No significant problems,Mostly yellow (72.4%) - ripe and stable.
+2026-10-23 09:56:25,bunch_20261023_001,10,Approved,ACCEPTABLE,Ripe,88.8,12.7,90.8,9.7,0.83,HIGH,No significant problems,Mostly yellow (90.8%) - ripe and stable.
+2026-10-23 15:02:31,bunch_20261023_003,8,Approved,ACCEPTABLE,Ripe,72.2,11.7,81.8,0.9,1.09,HIGH,No significant problems,Mostly yellow (81.8%) - ripe and stable.
+2026-10-23 16:14:39,bunch_20261023_005,13,Denied,HIGH RISK,Overripe,79.2,2.0,47.0,38.9,3.53,HIGH,High brown spotting (38.9%),Overripe bananas (38.9% brown) - approaching spoilage.
+2026-10-24 08:58:58,bunch_20261024_003,14,Approved,ACCEPTABLE,Ripe,74.9,5.1,74.0,11.2,0.31,HIGH,No significant problems,Mostly yellow (74.0%) - ripe and stable.
+2026-10-24 13:36:59,bunch_20261024_001,6,Approved,ACCEPTABLE,Ripe,79.2,14.9,89.2,1.2,1.08,HIGH,No significant problems,Mostly yellow (89.2%) - ripe and stable.
+2026-10-24 13:59:06,bunch_20261024_004,14,Approved,ACCEPTABLE,Unripe,31.0,87.1,15.9,4.4,0.1,HIGH,Mostly unripe,Green bunch (87.1%) - optimal for long-distance transit.
+2026-10-24 17:02:55,bunch_20261024_002,11,Approved,SEMI-RIPE,Semi-ripe,54.4,44.9,48.9,6.1,1.08,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-25 08:05:46,bunch_20261025_006,7,Approved,ACCEPTABLE,Ripe,80.2,10.9,85.8,5.6,0.47,HIGH,No significant problems,Mostly yellow (85.8%) - ripe and stable.
+2026-10-25 08:34:12,bunch_20261025_007,7,Approved,ACCEPTABLE,Unripe,31.8,77.1,22.0,1.5,0.52,HIGH,Mostly unripe,Green bunch (77.1%) - optimal for long-distance transit.
+2026-10-25 08:40:16,bunch_20261025_002,6,Approved,ACCEPTABLE,Ripe,74.1,2.1,75.2,9.9,0.33,HIGH,No significant problems,Mostly yellow (75.2%) - ripe and stable.
+2026-10-25 09:03:26,bunch_20261025_004,11,Approved,ACCEPTABLE,Ripe,80.6,11.2,85.8,5.9,0.26,HIGH,No significant problems,Mostly yellow (85.8%) - ripe and stable.
+2026-10-25 09:49:13,bunch_20261025_005,14,Denied,HIGH RISK,Overripe,94.4,1.0,58.7,44.3,8.28,MEDIUM,High brown spotting (44.3%),Overripe bananas (44.3% brown) - approaching spoilage.
+2026-10-25 14:09:40,bunch_20261025_003,7,Denied,HIGH RISK,Overripe,78.4,7.5,55.8,29.9,4.15,HIGH,High brown spotting (29.9%),Overripe bananas (29.9% brown) - approaching spoilage.
+2026-10-25 14:30:17,bunch_20261025_001,14,Approved,SEMI-RIPE,Semi-ripe,53.0,36.7,54.6,1.0,0.73,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-26 10:16:43,bunch_20261026_001,6,Approved,ACCEPTABLE,Ripe,84.5,13.8,84.7,10.4,1.16,HIGH,No significant problems,Mostly yellow (84.7%) - ripe and stable.
+2026-10-26 15:14:26,bunch_20261026_004,15,Approved,ACCEPTABLE,Unripe,28.9,82.5,18.6,0.7,0.12,HIGH,Mostly unripe,Green bunch (82.5%) - optimal for long-distance transit.
+2026-10-26 16:04:02,bunch_20261026_002,4,Approved,ACCEPTABLE,Ripe,73.4,11.4,73.7,9.1,0.4,HIGH,No significant problems,Mostly yellow (73.7%) - ripe and stable.
+2026-10-26 16:23:11,bunch_20261026_003,8,Approved,ACCEPTABLE,Ripe,69.8,9.1,77.7,2.3,0.4,HIGH,No significant problems,Mostly yellow (77.7%) - ripe and stable.
+2026-10-26 17:02:19,bunch_20261026_005,7,Approved,SEMI-RIPE,Semi-ripe,46.5,27.7,47.6,1.9,1.33,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-27 08:59:37,bunch_20261027_003,9,Approved,ACCEPTABLE,Unripe,30.6,81.7,20.7,0.7,0.15,HIGH,Mostly unripe,Green bunch (81.7%) - optimal for long-distance transit.
+2026-10-27 13:47:56,bunch_20261027_001,4,Approved,ACCEPTABLE,Ripe,78.4,6.2,82.6,7.3,0.63,HIGH,No significant problems,Mostly yellow (82.6%) - ripe and stable.
+2026-10-27 15:20:17,bunch_20261027_002,12,Approved,SEMI-RIPE,Semi-ripe,52.2,47.4,45.9,6.1,1.29,MEDIUM,Mid-ripening - green fading to yellow,Bananas mid-ripening - suitable for distribution.
+2026-10-25 11:00:57,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-10-25 11:01:29,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-10-27 11:07:30,240_F_2198946922_Sq6idWOIpzrYRgeJvRuBZx44p6acQfjh.jpg,21,Approved,ACCEPTABLE,Ripe,82.6,0.1,95.2,1.7,0.0,MEDIUM,Mostly ripe,"Mostly yellow (95.2%) - ripe. (color only, no gas sensor)."
+2026-10-27 11:07:56,Ripe_yellow_banana_bunch_2K_20260919231157.jpeg,1,Approved,ACCEPTABLE,Ripe,100.0,0.0,99.8,19.0,0.0,MEDIUM,Mostly ripe,"Mostly yellow (99.8%) - ripe. (color only, no gas sensor)."
+2026-10-27 11:08:08,240_F_2198946922_Sq6idWOIpzrYRgeJvRuBZx44p6acQfjh.jpg,21,Approved,ACCEPTABLE,Ripe,82.6,0.1,95.2,1.7,0.0,MEDIUM,Mostly ripe,"Mostly yellow (95.2%) - ripe. (color only, no gas sensor)."
+2026-10-27 11:08:25,1000_F_2106730746_wk8RGMk5V5xBcpeXz5e6UCM0jKMMC3T4.jpg,12,Approved,ACCEPTABLE,Semi-Ripe,73.3,16.9,81.9,1.2,0.0,MEDIUM,Mid-ripening - green fading to yellow,"Mostly yellow (81.9%) - ripe. (color only, no gas sensor)."
+2026-10-27 11:10:13,live_bunch_111013,8,Denied,HIGH RISK,Overripe,91.5,1.6,57.0,42.8,1.99,HIGH,High brown spotting (42.8%),Overripe bananas present - approaching spoilage.
+2026-10-27 11:10:23,live_bunch_111023,13,Approved,ACCEPTABLE,Ripe,76.1,10.0,78.9,7.5,1.01,HIGH,No significant problems,Ripe yellow bunch - optimal for market.
+2026-10-27 11:17:19,240_F_2196992637_4QbFXSZMvg81TSqcqUHEFcJbaIQ4wSOk.jpg,17,Approved,ACCEPTABLE,Ripe,83.9,0.0,95.1,3.1,0.0,MEDIUM,Mostly ripe,"Mostly yellow (95.1%) - ripe. (color only, no gas sensor)."
