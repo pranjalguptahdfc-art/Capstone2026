@@ -1,0 +1,161 @@
+{
+  "image": "images.jfif",
+  "n_detections": 9,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        84,
+        507,
+        181,
+        596
+      ],
+      "conf": 0.7071,
+      "green_pct": 0.0,
+      "yellow_pct": 90.2,
+      "brown_pct": 8.0,
+      "other_pct": 1.9,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        183,
+        425,
+        326,
+        548
+      ],
+      "conf": 0.5877,
+      "green_pct": 0.0,
+      "yellow_pct": 96.0,
+      "brown_pct": 3.8,
+      "other_pct": 0.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        171,
+        333,
+        293,
+        420
+      ],
+      "conf": 0.4261,
+      "green_pct": 0.0,
+      "yellow_pct": 91.5,
+      "brown_pct": 7.9,
+      "other_pct": 0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        81,
+        372,
+        111,
+        413
+      ],
+      "conf": 0.4061,
+      "green_pct": 0.0,
+      "yellow_pct": 99.4,
+      "brown_pct": 0.6,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 5,
+      "bbox": [
+        73,
+        521,
+        111,
+        596
+      ],
+      "conf": 0.3375,
+      "green_pct": 0.0,
+      "yellow_pct": 84.9,
+      "brown_pct": 12.5,
+      "other_pct": 2.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 6,
+      "bbox": [
+        76,
+        411,
+        111,
+        492
+      ],
+      "conf": 0.254,
+      "green_pct": 0.0,
+      "yellow_pct": 94.5,
+      "brown_pct": 3.9,
+      "other_pct": 1.7,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 7,
+      "bbox": [
+        119,
+        298,
+        177,
+        320
+      ],
+      "conf": 0.2504,
+      "green_pct": 0.0,
+      "yellow_pct": 90.8,
+      "brown_pct": 8.4,
+      "other_pct": 0.9,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 8,
+      "bbox": [
+        84,
+        369,
+        169,
+        490
+      ],
+      "conf": 0.2269,
+      "green_pct": 0.1,
+      "yellow_pct": 90.7,
+      "brown_pct": 8.4,
+      "other_pct": 0.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 9,
+      "bbox": [
+        302,
+        337,
+        334,
+        422
+      ],
+      "conf": 0.2148,
+      "green_pct": 0.0,
+      "yellow_pct": 95.8,
+      "brown_pct": 4.2,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Ripe",
+    "avg_ripeness_pct": 85.2,
+    "avg_green": 0.0,
+    "avg_yellow": 92.6,
+    "avg_brown": 6.4
+  },
+  "seconds": 1.07
+}

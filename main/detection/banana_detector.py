@@ -14,7 +14,7 @@ are returned.  The fallback is clearly labelled in logs and the Streamlit UI.
 import os
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Tuple
 
 import numpy as np
 import cv2
@@ -39,6 +39,22 @@ ADAPTIVE_INFERENCE_CONF = 0.10   # pass-1 inference always runs this low to catc
 RELATIVE_KEEP_RATIO = 0.30      # keep boxes at >= best_score * this ratio
 ABSOLUTE_FLOOR = 0.08          # ... but never below this
 NMS_IOU_THRESHOLD = 0.50       # score-ordered NMS suppression threshold
+
+# Gated slice boost for far-distance / small bunches (non-teachable).
+# YOLOv8 resizes inputs to 640x640, so on small photos the bunch is
+# downsampled and individual bananas drop below the network's localization
+# limit. Measured on this project's images (2026-07-09):
+#   working close-range images: full-frame best conf 0.58-0.73
+#   far-distance image (335x597): full-frame best conf 0.18, 4 boxes
+# while overlapping-slice inference found 9 boxes (best conf 0.49).
+# Slicing only fires when the full-frame pass is weak AND the image is
+# small, so close-range images keep bit-identical results (regression
+# guard, see tests/test_adaptive_detection.py).
+SLICE_GATE_BEST_CONF = 0.35    # slice only when full-frame best conf is below this
+SLICE_MAX_LONG_SIDE = 1024     # ... and only when the image is this small or smaller
+SLICE_TILES = 3                # 3x3 overlapping tile grid
+SLICE_OVERLAP = 0.25           # 25% overlap between adjacent tiles
+SLICE_MIN_TILE_PX = 64         # skip tiles smaller than this (below useful input size)
 
 
 def _iou(a: list, b: list) -> float:
@@ -87,6 +103,98 @@ def suppress_duplicates(detections: list, iou_threshold: Optional[float] = None)
     for i, d in enumerate(kept, start=1):
         d["banana_id"] = i
     return kept
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Gated slice boost (far-distance / small bunches)
+# ──────────────────────────────────────────────────────────────────────────────
+def generate_slices(
+    img_w: int,
+    img_h: int,
+    n_tiles: int = SLICE_TILES,
+    overlap: float = SLICE_OVERLAP,
+) -> List[Tuple[int, int, int, int]]:
+    """Build a grid of overlapping tiles covering the whole image.
+
+    Returns tile boxes as ``(x0, y0, x1, y1)`` in original-image pixel
+    coords, with the first column / row starting at the origin and the last
+    reaching the far edge, so every pixel is covered by at least one tile.
+    Tiles smaller than ``SLICE_MIN_TILE_PX`` on either side are skipped
+    (they add no useful resolution and cost an inference pass).
+    """
+    tile_w = img_w / n_tiles
+    tile_h = img_h / n_tiles
+    step_x = tile_w * (1.0 - overlap)
+    step_y = tile_h * (1.0 - overlap)
+    tiles: List[Tuple[int, int, int, int]] = []
+    for ty in range(n_tiles):
+        for tx in range(n_tiles):
+            x0 = 0 if tx == 0 else int(round(tx * step_x))
+            y0 = 0 if ty == 0 else int(round(ty * step_y))
+            # Last column / row always reaches the far edge (guaranteed coverage).
+            x1 = img_w if tx == n_tiles - 1 else int(round(x0 + tile_w))
+            y1 = img_h if ty == n_tiles - 1 else int(round(y0 + tile_h))
+            if x1 - x0 < SLICE_MIN_TILE_PX or y1 - y0 < SLICE_MIN_TILE_PX:
+                continue
+            tiles.append((x0, y0, x1, y1))
+    return tiles
+
+
+def should_slice(
+    full_best_conf: float,
+    img_w: int,
+    img_h: int,
+    gate_conf: float = SLICE_GATE_BEST_CONF,
+    max_long_side: int = SLICE_MAX_LONG_SIDE,
+) -> bool:
+    """Decide whether to run the slice-boost path for this image.
+
+    Fires only when BOTH:
+      * the full-frame pass was weak (best conf < gate_conf) — a strong
+        full-frame read means the bunch is already resolvable, so slicing
+        would just add cost and change working results; and
+      * the image is small enough that YOLO's 640x640 input downsamples
+        the bunch (longest side <= max_long_side).
+    """
+    longest = max(img_w, img_h)
+    return full_best_conf < gate_conf and longest <= max_long_side
+
+
+def slice_candidates(
+    detector: "BananaDetector",
+    image: np.ndarray,
+    conf: float = ADAPTIVE_INFERENCE_CONF,
+    n_tiles: int = SLICE_TILES,
+    overlap: float = SLICE_OVERLAP,
+) -> List[Dict[str, Any]]:
+    """Run the detector on each tile and map boxes back to original coords.
+
+    Pure wrapper around ``detector._run_inference`` — no model logic here.
+    Boxes are clipped to the image bounds. banana_id is re-numbered later
+    by the caller's NMS pass.
+    """
+    img_h, img_w = image.shape[:2]
+    tiles = generate_slices(img_w, img_h, n_tiles=n_tiles, overlap=overlap)
+    candidates: List[Dict[str, Any]] = []
+    for x0, y0, x1, y1 in tiles:
+        tile = image[y0:y1, x0:x1]
+        if tile.size == 0:
+            continue
+        for d in detector._run_inference(tile, conf):
+            bx = d["bbox"]
+            # map back into original-image coords, clip to bounds
+            ox1 = max(0, min(x0 + bx[0], img_w - 1))
+            oy1 = max(0, min(y0 + bx[1], img_h - 1))
+            ox2 = max(0, min(x0 + bx[2], img_w - 1))
+            oy2 = max(0, min(y0 + bx[3], img_h - 1))
+            if ox2 <= ox1 or oy2 <= oy1:
+                continue
+            candidates.append({
+                "banana_id": 0,
+                "bbox": [ox1, oy1, ox2, oy2],
+                "confidence": d["confidence"],
+            })
+    return candidates
 
 
 class BananaDetector:
@@ -228,8 +336,26 @@ class BananaDetector:
             candidates = relative_score_filter(candidates, absolute_floor=abs_floor)
             return suppress_duplicates(candidates)
 
+        img_h, img_w = image.shape[:2]
+
         # Pass 1: original image at a low confidence (finds occluded bananas)
-        detections = _postprocess(self._run_inference(image, ADAPTIVE_INFERENCE_CONF))
+        full_candidates = self._run_inference(image, ADAPTIVE_INFERENCE_CONF)
+
+        # Gated slice boost: when the full-frame read is weak AND the image is
+        # small (far-distance bunch — YOLO's 640x640 input downsamples it),
+        # run overlapping-tile inference and merge its boxes in. Strong or
+        # large images skip this, so their results are unchanged.
+        best_conf = max((c["confidence"] for c in full_candidates), default=0.0)
+        candidates = full_candidates
+        if should_slice(best_conf, img_w, img_h):
+            sliced = slice_candidates(self, image)
+            candidates = full_candidates + sliced
+            logger.info(
+                f"Slice boost: weak full-frame read (best {best_conf:.3f}), "
+                f"merged {len(sliced)} tile box(es) into {len(full_candidates)}."
+            )
+
+        detections = _postprocess(candidates)
 
         # Pass 2: contrast-enhanced image at lower confidence
         if not detections:

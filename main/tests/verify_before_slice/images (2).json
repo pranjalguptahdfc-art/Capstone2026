@@ -1,0 +1,433 @@
+{
+  "image": "images (2).jfif",
+  "n_detections": 26,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        77,
+        285,
+        216,
+        398
+      ],
+      "conf": 0.7311,
+      "green_pct": 0.0,
+      "yellow_pct": 99.3,
+      "brown_pct": 0.6,
+      "other_pct": 0.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        90,
+        201,
+        213,
+        324
+      ],
+      "conf": 0.7039,
+      "green_pct": 7.2,
+      "yellow_pct": 70.4,
+      "brown_pct": 3.9,
+      "other_pct": 18.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        0,
+        192,
+        106,
+        319
+      ],
+      "conf": 0.6155,
+      "green_pct": 1.5,
+      "yellow_pct": 86.4,
+      "brown_pct": 2.8,
+      "other_pct": 9.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        0,
+        294,
+        82,
+        398
+      ],
+      "conf": 0.5988,
+      "green_pct": 0.0,
+      "yellow_pct": 99.6,
+      "brown_pct": 0.1,
+      "other_pct": 0.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 5,
+      "bbox": [
+        330,
+        216,
+        442,
+        398
+      ],
+      "conf": 0.5729,
+      "green_pct": 4.5,
+      "yellow_pct": 90.5,
+      "brown_pct": 0.2,
+      "other_pct": 4.9,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 6,
+      "bbox": [
+        297,
+        68,
+        359,
+        159
+      ],
+      "conf": 0.5593,
+      "green_pct": 3.6,
+      "yellow_pct": 83.1,
+      "brown_pct": 1.4,
+      "other_pct": 11.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 7,
+      "bbox": [
+        182,
+        12,
+        288,
+        93
+      ],
+      "conf": 0.5422,
+      "green_pct": 0.0,
+      "yellow_pct": 98.0,
+      "brown_pct": 0.1,
+      "other_pct": 1.9,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 8,
+      "bbox": [
+        210,
+        279,
+        332,
+        396
+      ],
+      "conf": 0.5346,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.0,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 9,
+      "bbox": [
+        546,
+        299,
+        599,
+        399
+      ],
+      "conf": 0.4462,
+      "green_pct": 0.0,
+      "yellow_pct": 96.4,
+      "brown_pct": 2.2,
+      "other_pct": 1.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 10,
+      "bbox": [
+        436,
+        130,
+        523,
+        244
+      ],
+      "conf": 0.4399,
+      "green_pct": 0.0,
+      "yellow_pct": 95.8,
+      "brown_pct": 1.7,
+      "other_pct": 2.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 11,
+      "bbox": [
+        129,
+        53,
+        210,
+        148
+      ],
+      "conf": 0.4125,
+      "green_pct": 8.2,
+      "yellow_pct": 86.7,
+      "brown_pct": 2.9,
+      "other_pct": 2.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 12,
+      "bbox": [
+        0,
+        75,
+        66,
+        183
+      ],
+      "conf": 0.4058,
+      "green_pct": 2.2,
+      "yellow_pct": 97.6,
+      "brown_pct": 0.2,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 13,
+      "bbox": [
+        106,
+        118,
+        199,
+        219
+      ],
+      "conf": 0.3771,
+      "green_pct": 0.5,
+      "yellow_pct": 98.2,
+      "brown_pct": 0.3,
+      "other_pct": 1.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 14,
+      "bbox": [
+        421,
+        4,
+        507,
+        86
+      ],
+      "conf": 0.3756,
+      "green_pct": 0.0,
+      "yellow_pct": 99.8,
+      "brown_pct": 0.0,
+      "other_pct": 0.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 15,
+      "bbox": [
+        429,
+        222,
+        538,
+        311
+      ],
+      "conf": 0.372,
+      "green_pct": 3.0,
+      "yellow_pct": 83.1,
+      "brown_pct": 1.8,
+      "other_pct": 12.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 16,
+      "bbox": [
+        0,
+        144,
+        45,
+        224
+      ],
+      "conf": 0.37,
+      "green_pct": 23.4,
+      "yellow_pct": 75.4,
+      "brown_pct": 0.3,
+      "other_pct": 1.0,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    },
+    {
+      "id": 17,
+      "bbox": [
+        358,
+        130,
+        447,
+        232
+      ],
+      "conf": 0.3595,
+      "green_pct": 0.9,
+      "yellow_pct": 95.4,
+      "brown_pct": 2.1,
+      "other_pct": 1.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 18,
+      "bbox": [
+        355,
+        70,
+        431,
+        144
+      ],
+      "conf": 0.3578,
+      "green_pct": 0.1,
+      "yellow_pct": 91.8,
+      "brown_pct": 4.1,
+      "other_pct": 4.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 19,
+      "bbox": [
+        68,
+        41,
+        133,
+        146
+      ],
+      "conf": 0.3256,
+      "green_pct": 0.2,
+      "yellow_pct": 87.4,
+      "brown_pct": 4.1,
+      "other_pct": 8.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 20,
+      "bbox": [
+        177,
+        58,
+        300,
+        219
+      ],
+      "conf": 0.3209,
+      "green_pct": 5.8,
+      "yellow_pct": 84.5,
+      "brown_pct": 2.3,
+      "other_pct": 7.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 21,
+      "bbox": [
+        538,
+        214,
+        599,
+        311
+      ],
+      "conf": 0.3165,
+      "green_pct": 4.2,
+      "yellow_pct": 82.5,
+      "brown_pct": 3.8,
+      "other_pct": 9.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 22,
+      "bbox": [
+        430,
+        60,
+        516,
+        147
+      ],
+      "conf": 0.3088,
+      "green_pct": 5.6,
+      "yellow_pct": 92.0,
+      "brown_pct": 2.0,
+      "other_pct": 0.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 23,
+      "bbox": [
+        517,
+        127,
+        599,
+        245
+      ],
+      "conf": 0.2973,
+      "green_pct": 0.1,
+      "yellow_pct": 99.7,
+      "brown_pct": 0.0,
+      "other_pct": 0.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 24,
+      "bbox": [
+        298,
+        137,
+        372,
+        248
+      ],
+      "conf": 0.2893,
+      "green_pct": 0.0,
+      "yellow_pct": 98.6,
+      "brown_pct": 0.4,
+      "other_pct": 1.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 25,
+      "bbox": [
+        509,
+        52,
+        599,
+        156
+      ],
+      "conf": 0.2884,
+      "green_pct": 2.0,
+      "yellow_pct": 94.6,
+      "brown_pct": 2.6,
+      "other_pct": 0.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 26,
+      "bbox": [
+        431,
+        290,
+        561,
+        398
+      ],
+      "conf": 0.2422,
+      "green_pct": 0.0,
+      "yellow_pct": 99.6,
+      "brown_pct": 0.3,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Ripe",
+    "avg_ripeness_pct": 80.0,
+    "avg_green": 2.8,
+    "avg_yellow": 91.8,
+    "avg_brown": 1.5
+  },
+  "seconds": 0.2
+}
