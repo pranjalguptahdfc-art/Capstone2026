@@ -8,30 +8,45 @@ stand, crate, other bananas). This module isolates the banana BODY — the solid
 blob that touches the box center — so color analysis can ignore the background.
 
 Pure OpenCV post-processing. No model, no training.
+
+The isolation windows are derived from the single color_model source of
+truth (green + warm families, V floors dropped to MIN_V so dim bananas
+are still seen). This keeps the mask and the ripeness analysis in the
+same color space, so one banana can never be "masked as body" and then
+"counted as background" by a different threshold set.
 """
 
 import cv2
 import numpy as np
 
-from .color_analyzer import HSV_RANGES
+from .color_model import GREEN_H, WARM_H, MIN_S, MIN_V, PALE_LOWER, PALE_UPPER
 
-# Last-resort window for banana colors the three HSV ranges miss
-# (very pale / white / over-bleached bananas).
-_LAST_RESORT_LOWER = np.array([0, 0, 180], dtype=np.uint8)
-_LAST_RESORT_UPPER = np.array([179, 20, 255], dtype=np.uint8)
+# Per-family windows used only for BODY ISOLATION (not counting):
+# each window is generous on V (dim to bright), so lighting does not
+# decide whether the body is seen.
+_WINDOWS = [
+    # green family
+    (np.array([GREEN_H[0], MIN_S, MIN_V], dtype=np.uint8),
+     np.array([GREEN_H[1], 255, 255], dtype=np.uint8)),
+    # warm family (yellow + brown)
+    (np.array([WARM_H[0], MIN_S, MIN_V], dtype=np.uint8),
+     np.array([WARM_H[1], 255, 255], dtype=np.uint8)),
+]
 
 
 def banana_mask(crop_bgr: np.ndarray) -> np.ndarray:
     """Return a uint8 mask (banana=255) for the banana body inside a crop.
 
-    Per color window (green / yellow / brown), keep only the connected
-    component that touches the crop CENTER. The banana body sits in the
-    middle of its own box; background of the same color family (a green
-    stand, a yellow shelf) forms a ring reaching the edges, not the
-    center, so it is dropped. The kept components are unioned.
+    Per color window (green / warm), keep only the connected component
+    that touches the crop CENTER. The banana body sits in the middle of
+    its own box; background of the same color family (a green stand, a
+    yellow shelf) forms a ring reaching the edges, not the center, so
+    it is dropped. The kept components are unioned.
 
-    If no window touches the center (overexposed / all-white banana),
-    fall back to a low-saturation/high-value window.
+    Windows are derived from color_model (green + warm families) with
+    generous V floors so dim or bright bodies are both seen. If no
+    window touches the center (overexposed / whitened / all-pale body),
+    fall back to the pale last-resort window.
     """
     hsv = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2HSV)
     h, w = hsv.shape[:2]
@@ -39,8 +54,8 @@ def banana_mask(crop_bgr: np.ndarray) -> np.ndarray:
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
     union = np.zeros((h, w), dtype=np.uint8)
-    for _name, rng in HSV_RANGES.items():
-        m = cv2.inRange(hsv, rng["lower"], rng["upper"])
+    for lower, upper in _WINDOWS:
+        m = cv2.inRange(hsv, lower, upper)
         m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, kernel)
         m = cv2.morphologyEx(m, cv2.MORPH_OPEN, kernel)
         n, labels = cv2.connectedComponents(m)
@@ -51,7 +66,7 @@ def banana_mask(crop_bgr: np.ndarray) -> np.ndarray:
             union = cv2.bitwise_or(union, (labels == c).astype(np.uint8) * 255)
 
     if int(np.count_nonzero(union)) == 0:
-        union = cv2.inRange(hsv, _LAST_RESORT_LOWER, _LAST_RESORT_UPPER)
+        union = cv2.inRange(hsv, PALE_LOWER, PALE_UPPER)
     return union
 
 

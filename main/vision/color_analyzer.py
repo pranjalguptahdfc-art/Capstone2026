@@ -20,24 +20,6 @@ from typing import Optional
 
 from .color_model import compute_v_ref, family_counts
 
-
-# ── HSV thresholds ──────────────────────────────────────────────────────────
-
-HSV_RANGES = {
-    "green": {
-        "lower": np.array([35, 30, 30], dtype=np.uint8),
-        "upper": np.array([85, 255, 255], dtype=np.uint8),
-    },
-    "yellow": {
-        "lower": np.array([15, 30, 80], dtype=np.uint8),
-        "upper": np.array([35, 255, 255], dtype=np.uint8),
-    },
-    "brown": {
-        "lower": np.array([0, 10, 20], dtype=np.uint8),
-        "upper": np.array([25, 200, 200], dtype=np.uint8),
-    },
-}
-
 COLOR_TO_RIPENESS = {
     "green": "unripe",
     "yellow": "ripe",
