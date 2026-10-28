@@ -74,6 +74,19 @@ def uploaded_file_to_bgr(uploaded_file):
     return pil_to_cv2(pil_img)
 
 
+def _goto_analytics():
+    """Button on_click callback (Streamlit-safe navigation).
+
+    A callback runs in the *pre* phase, before the next script pass
+    re-instantiates the nav radio — so writing the radio's session_state key
+    here is legal. Writing `st.session_state["app_nav"]` directly from inside
+    the button's `if st.button(...)` block (i.e. after the radio was already
+    instantiated in the same run) raises
+    `StreamlitWidgetAlreadyInstantiatedError`.
+    """
+    st.session_state["app_nav"] = "📊 Analytics"
+
+
 def main():
     with st.sidebar:
         st.markdown("## 🍌 Banana Vision AI")
@@ -154,12 +167,12 @@ def main():
 
     st.subheader("Upload a banana bunch image")
     uploaded = st.file_uploader(
-        "Choose an image", type=["jpg", "jpeg", "png"],
+        "Choose an image", type=["jpg", "jpeg", "jfif", "png"],
         label_visibility="collapsed",
     )
 
     if uploaded is None:
-        st.info("Please upload a banana bunch image (JPG / JPEG / PNG).")
+        st.info("Please upload a banana bunch image (JPG / JPEG / JFIF / PNG).")
         return
 
     try:
@@ -277,16 +290,25 @@ def main():
         )
         st.session_state["last_logged_key"] = log_key
 
-    log_c1, log_c2 = st.columns([3, 1])
+    log_c1, _ = st.columns([3, 1])
     with log_c1:
         st.success(
             f"✓ Inspection record timestamped & logged to 30-day analytics database! "
             f"(Decision: **{decision}**, Stage: **{stage}**, Ripeness: **{avg_ripeness_pct}%**)"
         )
-    with log_c2:
-        if st.button("📊 View Analytics", key="btn_goto_analytics"):
-            st.session_state["app_nav"] = "📊 Analytics"
-            st.rerun()
+
+    # "View Analytics" navigation, centered under the stat cards. Uses an
+    # on_click callback (the Streamlit-safe way to switch pages — see
+    # _goto_analytics) so the radio's session_state key is written in the
+    # pre-rerun phase, not after the radio is already instantiated.
+    _cl, _cm, _cr = st.columns([3, 2, 3])
+    with _cm:
+        st.button(
+            "📊 View Analytics",
+            key="btn_goto_analytics",
+            on_click=_goto_analytics,
+            width="stretch",
+        )
 
     st.info(f"**Reasoning:** {bunch['reasoning']}")
     st.markdown(f"**Dominant Problem:** {bunch['dominant_problem']}")
@@ -320,7 +342,7 @@ def main():
             })
         if rows:
             import pandas as pd
-            st.dataframe(pd.DataFrame(rows), use_container_width=False, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), width="content", hide_index=True)
 
     # ── Bunch-level metrics ────────────────────────────────────────────────
     st.markdown("---")

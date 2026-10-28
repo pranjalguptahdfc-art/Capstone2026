@@ -288,7 +288,7 @@ def _render_approval_trends_tab(df: pd.DataFrame):
         .properties(height=340)
     )
 
-    st.altair_chart(bar_chart, use_container_width=True)
+    st.altair_chart(bar_chart, width="stretch")
 
     # Trend line for Daily Approval Rate %
     st.subheader("Daily Quality Approval Rate %")
@@ -319,7 +319,7 @@ def _render_approval_trends_tab(df: pd.DataFrame):
         .encode(y="y:Q")
     )
 
-    st.altair_chart(rate_chart + target_rule, use_container_width=True)
+    st.altair_chart(rate_chart + target_rule, width="stretch")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -381,7 +381,7 @@ def _render_ripeness_progression_tab(df: pd.DataFrame):
         .properties(height=260)
     )
 
-    st.altair_chart(ripeness_chart, use_container_width=True)
+    st.altair_chart(ripeness_chart, width="stretch")
 
     # Color breakdown over time (Green %, Yellow %, Brown %)
     st.subheader("Daily Color Spectrum Composition")
@@ -425,7 +425,7 @@ def _render_ripeness_progression_tab(df: pd.DataFrame):
         .properties(height=260)
     )
 
-    st.altair_chart(color_chart, use_container_width=True)
+    st.altair_chart(color_chart, width="stretch")
 
     # Ripeness Stage Breakdown
     col1, col2 = st.columns(2)
@@ -451,7 +451,7 @@ def _render_ripeness_progression_tab(df: pd.DataFrame):
             )
             .properties(height=280)
         )
-        st.altair_chart(stage_pie, use_container_width=True)
+        st.altair_chart(stage_pie, width="stretch")
 
     with col2:
         st.subheader("Quality Status Share")
@@ -475,7 +475,7 @@ def _render_ripeness_progression_tab(df: pd.DataFrame):
             )
             .properties(height=280)
         )
-        st.altair_chart(status_bar, use_container_width=True)
+        st.altair_chart(status_bar, width="stretch")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -510,7 +510,7 @@ def _render_denials_tab(df: pd.DataFrame):
             )
             .properties(height=260)
         )
-        st.altair_chart(reason_chart, use_container_width=True)
+        st.altair_chart(reason_chart, width="stretch")
 
     with col2:
         st.markdown("#### Summary of Denied Batches")
@@ -535,7 +535,7 @@ def _render_denials_tab(df: pd.DataFrame):
         "reasoning": "Diagnostic Reasoning",
     })
 
-    st.dataframe(display_denied, use_container_width=True, hide_index=True)
+    st.dataframe(display_denied, width="stretch", hide_index=True)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -580,7 +580,7 @@ def _render_data_tables_tab(df: pd.DataFrame, df_filtered: pd.DataFrame):
 
     st.dataframe(
         table_view,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "Decision": st.column_config.TextColumn(
@@ -628,7 +628,7 @@ def _render_data_tables_tab(df: pd.DataFrame, df_filtered: pd.DataFrame):
                 "Avg_Bananas": "Avg Bananas / Bunch",
                 "Total_Bananas": "Total Bananas",
             }),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
