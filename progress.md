@@ -81,3 +81,4 @@ git log --oneline -4            # d00ffad = main = GitHub
 python main/blind_batch.py --all   # 154-image measurement (~4 min CPU)
 python -m pytest main/tests/ -q    # 29 tests
 ```
+### Right now, ignore this and focus on choose.md
