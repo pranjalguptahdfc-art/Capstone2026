@@ -8,6 +8,18 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
+# ── Windows c10.dll preload (must run BEFORE any pandas import) ─────────────
+# On this machine (Windows, torch 2.14.0+cpu) the OpenMP runtimes clash:
+# if pandas loads first, the later ultralytics→torch import crashes with
+# "OSError [WinError 1114] ... c10.dll". Below, analytics_view (line ~20)
+# imports pandas at module top; the detector loads torch later, so torch
+# must be registered first. Loading torch here (before pandas) makes the
+# app's import order the safe one. Same fix as main/tests/conftest.py.
+try:
+    import torch  # noqa: F401
+except Exception:
+    pass  # torch absent: detector will surface the real import error
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
