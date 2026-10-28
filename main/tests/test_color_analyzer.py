@@ -25,7 +25,7 @@ from vision.color_analyzer import analyze_region, analyze_batch  # noqa: E402
 
 BRIGHT_YELLOW_BGR = (60, 200, 255)   # saturated ripe yellow
 DIM_YELLOW_BGR = (18, 60, 76)        # ripe yellow at ~0.3× exposure (HSV ~22,194,76)
-BROWN_SPOT_BGR = (30, 90, 90)        # dark brown spot (fits a BRIGHT body)
+BROWN_SPOT_BGR = (12, 38, 60)        # true brown spot on a BRIGHT body (H~30, S~204, V=60)
 NEAR_BLACK_BGR = (5, 15, 15)         # very dark overripe skin / spot
 GREY_BG_BGR = (120, 120, 120)        # neutral non-warm background (excluded by mask)
 

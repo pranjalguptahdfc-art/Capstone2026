@@ -87,10 +87,12 @@ def analyze_region(
 
     counts = family_counts(hsv, pixel_mask, compute_v_ref(hsv, pixel_mask))
 
+    # Exclusive families: measured counts, so the four buckets sum to 100%
+    # by construction and `other` can never be negative.
     green_pct = round(counts["green"] / total * 100, 1)
     yellow_pct = round(counts["yellow"] / total * 100, 1)
     brown_pct = round(counts["brown"] / total * 100, 1)
-    other_pct = round(100 - green_pct - yellow_pct - brown_pct, 1)
+    other_pct = round(counts["other"] / total * 100, 1)
 
     # Brown spots dominate: if >20%, it's overripe regardless of green/yellow
     if brown_pct > 20:

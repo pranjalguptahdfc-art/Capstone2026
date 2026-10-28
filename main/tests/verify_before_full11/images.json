@@ -1,0 +1,81 @@
+{
+  "image": "images.jfif",
+  "n_detections": 4,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        238,
+        202,
+        301,
+        254
+      ],
+      "conf": 0.1825,
+      "green_pct": 0.0,
+      "yellow_pct": 91.0,
+      "brown_pct": 8.5,
+      "other_pct": 0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        273,
+        559,
+        332,
+        596
+      ],
+      "conf": 0.1213,
+      "green_pct": 0.0,
+      "yellow_pct": 90.1,
+      "brown_pct": 24.1,
+      "other_pct": -14.2,
+      "dominant_color": "brown",
+      "ripeness_class": "overripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        293,
+        468,
+        327,
+        529
+      ],
+      "conf": 0.1133,
+      "green_pct": 0.0,
+      "yellow_pct": 97.6,
+      "brown_pct": 3.3,
+      "other_pct": -0.9,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        72,
+        507,
+        182,
+        596
+      ],
+      "conf": 0.1052,
+      "green_pct": 0.0,
+      "yellow_pct": 92.9,
+      "brown_pct": 7.1,
+      "other_pct": -0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "HIGH RISK",
+    "color_signal": "overripe",
+    "decision": "Denied",
+    "ripeness_stage": "Overripe",
+    "avg_ripeness_pct": 89.7,
+    "avg_green": 0.0,
+    "avg_yellow": 92.9,
+    "avg_brown": 10.8
+  },
+  "seconds": 0.16
+}

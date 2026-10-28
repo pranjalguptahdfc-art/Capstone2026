@@ -1,0 +1,241 @@
+{
+  "image": "images (8).jfif",
+  "n_detections": 14,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        274,
+        54,
+        453,
+        161
+      ],
+      "conf": 0.6139,
+      "green_pct": 0.5,
+      "yellow_pct": 90.9,
+      "brown_pct": 7.8,
+      "other_pct": 0.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        333,
+        378,
+        479,
+        440
+      ],
+      "conf": 0.4741,
+      "green_pct": 3.8,
+      "yellow_pct": 95.4,
+      "brown_pct": 0.4,
+      "other_pct": 0.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        343,
+        377,
+        479,
+        593
+      ],
+      "conf": 0.376,
+      "green_pct": 4.2,
+      "yellow_pct": 90.8,
+      "brown_pct": 4.5,
+      "other_pct": 0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        67,
+        334,
+        342,
+        568
+      ],
+      "conf": 0.3753,
+      "green_pct": 1.0,
+      "yellow_pct": 87.8,
+      "brown_pct": 11.0,
+      "other_pct": 0.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 5,
+      "bbox": [
+        123,
+        255,
+        275,
+        368
+      ],
+      "conf": 0.3628,
+      "green_pct": 1.8,
+      "yellow_pct": 93.6,
+      "brown_pct": 2.5,
+      "other_pct": 2.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 6,
+      "bbox": [
+        88,
+        336,
+        220,
+        427
+      ],
+      "conf": 0.3517,
+      "green_pct": 0.0,
+      "yellow_pct": 99.7,
+      "brown_pct": 0.3,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 7,
+      "bbox": [
+        87,
+        367,
+        226,
+        498
+      ],
+      "conf": 0.3455,
+      "green_pct": 0.3,
+      "yellow_pct": 95.6,
+      "brown_pct": 3.7,
+      "other_pct": 0.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 8,
+      "bbox": [
+        240,
+        325,
+        361,
+        414
+      ],
+      "conf": 0.3012,
+      "green_pct": 0.0,
+      "yellow_pct": 98.8,
+      "brown_pct": 1.0,
+      "other_pct": 0.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 9,
+      "bbox": [
+        0,
+        168,
+        121,
+        402
+      ],
+      "conf": 0.2796,
+      "green_pct": 0.3,
+      "yellow_pct": 98.7,
+      "brown_pct": 0.2,
+      "other_pct": 0.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 10,
+      "bbox": [
+        187,
+        19,
+        296,
+        117
+      ],
+      "conf": 0.2793,
+      "green_pct": 0.4,
+      "yellow_pct": 94.9,
+      "brown_pct": 4.3,
+      "other_pct": 0.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 11,
+      "bbox": [
+        380,
+        481,
+        479,
+        592
+      ],
+      "conf": 0.2619,
+      "green_pct": 0.0,
+      "yellow_pct": 94.7,
+      "brown_pct": 4.5,
+      "other_pct": 0.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 12,
+      "bbox": [
+        0,
+        271,
+        22,
+        379
+      ],
+      "conf": 0.239,
+      "green_pct": 0.0,
+      "yellow_pct": 99.3,
+      "brown_pct": 0.7,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 13,
+      "bbox": [
+        239,
+        385,
+        341,
+        534
+      ],
+      "conf": 0.2371,
+      "green_pct": 0.0,
+      "yellow_pct": 97.6,
+      "brown_pct": 2.4,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 14,
+      "bbox": [
+        463,
+        532,
+        479,
+        633
+      ],
+      "conf": 0.2157,
+      "green_pct": 0.0,
+      "yellow_pct": 94.4,
+      "brown_pct": 5.6,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Ripe",
+    "avg_ripeness_pct": 84.5,
+    "avg_green": 0.9,
+    "avg_yellow": 95.2,
+    "avg_brown": 3.5
+  },
+  "seconds": 0.18
+}

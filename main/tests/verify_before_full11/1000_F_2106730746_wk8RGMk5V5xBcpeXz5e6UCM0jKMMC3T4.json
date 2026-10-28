@@ -1,0 +1,209 @@
+{
+  "image": "1000_F_2106730746_wk8RGMk5V5xBcpeXz5e6UCM0jKMMC3T4.jpg",
+  "n_detections": 12,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        128,
+        645,
+        642,
+        999
+      ],
+      "conf": 0.7084,
+      "green_pct": 3.7,
+      "yellow_pct": 89.4,
+      "brown_pct": 2.7,
+      "other_pct": 4.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        183,
+        84,
+        462,
+        337
+      ],
+      "conf": 0.618,
+      "green_pct": 2.3,
+      "yellow_pct": 92.9,
+      "brown_pct": 0.8,
+      "other_pct": 4.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        0,
+        490,
+        254,
+        781
+      ],
+      "conf": 0.5771,
+      "green_pct": 31.6,
+      "yellow_pct": 78.5,
+      "brown_pct": 0.4,
+      "other_pct": -10.5,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        151,
+        453,
+        436,
+        668
+      ],
+      "conf": 0.4966,
+      "green_pct": 15.5,
+      "yellow_pct": 89.5,
+      "brown_pct": 0.0,
+      "other_pct": -5.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 5,
+      "bbox": [
+        410,
+        530,
+        744,
+        782
+      ],
+      "conf": 0.3663,
+      "green_pct": 2.1,
+      "yellow_pct": 95.3,
+      "brown_pct": 1.4,
+      "other_pct": 1.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 6,
+      "bbox": [
+        378,
+        683,
+        637,
+        859
+      ],
+      "conf": 0.3252,
+      "green_pct": 4.4,
+      "yellow_pct": 90.2,
+      "brown_pct": 0.1,
+      "other_pct": 5.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 7,
+      "bbox": [
+        637,
+        272,
+        749,
+        443
+      ],
+      "conf": 0.3236,
+      "green_pct": 22.1,
+      "yellow_pct": 80.2,
+      "brown_pct": 1.6,
+      "other_pct": -3.9,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    },
+    {
+      "id": 8,
+      "bbox": [
+        241,
+        293,
+        542,
+        512
+      ],
+      "conf": 0.3082,
+      "green_pct": 1.9,
+      "yellow_pct": 98.6,
+      "brown_pct": 0.6,
+      "other_pct": -1.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 9,
+      "bbox": [
+        543,
+        0,
+        676,
+        93
+      ],
+      "conf": 0.2622,
+      "green_pct": 17.1,
+      "yellow_pct": 67.6,
+      "brown_pct": 0.0,
+      "other_pct": 15.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 10,
+      "bbox": [
+        333,
+        287,
+        619,
+        421
+      ],
+      "conf": 0.2323,
+      "green_pct": 8.1,
+      "yellow_pct": 76.4,
+      "brown_pct": 2.7,
+      "other_pct": 12.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 11,
+      "bbox": [
+        16,
+        288,
+        259,
+        445
+      ],
+      "conf": 0.2237,
+      "green_pct": 93.5,
+      "yellow_pct": 28.3,
+      "brown_pct": 0.0,
+      "other_pct": -21.8,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 12,
+      "bbox": [
+        532,
+        406,
+        749,
+        530
+      ],
+      "conf": 0.2191,
+      "green_pct": 0.6,
+      "yellow_pct": 96.2,
+      "brown_pct": 3.5,
+      "other_pct": -0.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "semi-ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Semi-Ripe",
+    "avg_ripeness_pct": 73.3,
+    "avg_green": 16.9,
+    "avg_yellow": 81.9,
+    "avg_brown": 1.2
+  },
+  "seconds": 5.52
+}

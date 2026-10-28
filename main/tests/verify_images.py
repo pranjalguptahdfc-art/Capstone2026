@@ -53,6 +53,8 @@ from vision.color_analyzer import analyze_batch, annotate_colors  # noqa: E402
 AUTO_CONF = 0.10
 AUTO_FLOOR = False
 DEFAULT_OUT = _MAIN / "tests" / "verify"
+# .jfif = JPEG files saved by Windows browsers ("images (1).jfif").
+IMAGE_EXTS = (".jpg", ".jpeg", ".jfif", ".png")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -172,7 +174,7 @@ def verify_folder(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     images = [p for p in sorted(folder.iterdir())
-              if p.suffix.lower() in (".jpg", ".jpeg", ".png")]
+              if p.suffix.lower() in IMAGE_EXTS]
     if limit is not None:
         images = images[:limit]
     if not images:

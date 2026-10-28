@@ -1,0 +1,81 @@
+{
+  "image": "pexels-bertellifotografia-30893285.jpg",
+  "n_detections": 4,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        0,
+        444,
+        2514,
+        3530
+      ],
+      "conf": 0.8516,
+      "green_pct": 25.7,
+      "yellow_pct": 71.1,
+      "brown_pct": 2.4,
+      "other_pct": 0.8,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        5204,
+        1769,
+        6715,
+        3484
+      ],
+      "conf": 0.627,
+      "green_pct": 2.7,
+      "yellow_pct": 91.3,
+      "brown_pct": 5.4,
+      "other_pct": 0.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        2288,
+        1659,
+        5525,
+        3824
+      ],
+      "conf": 0.6008,
+      "green_pct": 0.1,
+      "yellow_pct": 95.3,
+      "brown_pct": 4.5,
+      "other_pct": 0.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        2315,
+        1013,
+        4193,
+        1953
+      ],
+      "conf": 0.2727,
+      "green_pct": 1.1,
+      "yellow_pct": 82.0,
+      "brown_pct": 6.6,
+      "other_pct": 10.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "SEMI-RIPE",
+    "color_signal": "semi-ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Semi-Ripe",
+    "avg_ripeness_pct": 78.0,
+    "avg_green": 7.4,
+    "avg_yellow": 84.9,
+    "avg_brown": 4.7
+  },
+  "seconds": 1.75
+}

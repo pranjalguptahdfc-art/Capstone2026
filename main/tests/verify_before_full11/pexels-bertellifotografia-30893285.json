@@ -1,0 +1,81 @@
+{
+  "image": "pexels-bertellifotografia-30893285.jpg",
+  "n_detections": 4,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        0,
+        444,
+        2514,
+        3530
+      ],
+      "conf": 0.8516,
+      "green_pct": 25.6,
+      "yellow_pct": 73.8,
+      "brown_pct": 5.0,
+      "other_pct": -4.4,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        5204,
+        1769,
+        6715,
+        3484
+      ],
+      "conf": 0.627,
+      "green_pct": 2.7,
+      "yellow_pct": 90.6,
+      "brown_pct": 4.9,
+      "other_pct": 1.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        2288,
+        1659,
+        5525,
+        3824
+      ],
+      "conf": 0.6008,
+      "green_pct": 0.1,
+      "yellow_pct": 99.9,
+      "brown_pct": 10.0,
+      "other_pct": -10.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        2315,
+        1013,
+        4193,
+        1953
+      ],
+      "conf": 0.2727,
+      "green_pct": 1.1,
+      "yellow_pct": 77.9,
+      "brown_pct": 33.8,
+      "other_pct": -12.8,
+      "dominant_color": "brown",
+      "ripeness_class": "overripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "HIGH RISK",
+    "color_signal": "overripe",
+    "decision": "Denied",
+    "ripeness_stage": "Overripe",
+    "avg_ripeness_pct": 87.2,
+    "avg_green": 7.4,
+    "avg_yellow": 85.5,
+    "avg_brown": 13.4
+  },
+  "seconds": 2.01
+}

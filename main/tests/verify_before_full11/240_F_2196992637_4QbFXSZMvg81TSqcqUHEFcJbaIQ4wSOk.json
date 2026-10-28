@@ -1,0 +1,289 @@
+{
+  "image": "240_F_2196992637_4QbFXSZMvg81TSqcqUHEFcJbaIQ4wSOk.jpg",
+  "n_detections": 17,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        137,
+        133,
+        183,
+        174
+      ],
+      "conf": 0.5571,
+      "green_pct": 0.0,
+      "yellow_pct": 99.3,
+      "brown_pct": 1.2,
+      "other_pct": -0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        156,
+        108,
+        180,
+        140
+      ],
+      "conf": 0.3985,
+      "green_pct": 0.0,
+      "yellow_pct": 89.0,
+      "brown_pct": 4.6,
+      "other_pct": 6.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        136,
+        113,
+        160,
+        142
+      ],
+      "conf": 0.3921,
+      "green_pct": 0.0,
+      "yellow_pct": 89.1,
+      "brown_pct": 4.2,
+      "other_pct": 6.7,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        292,
+        120,
+        328,
+        150
+      ],
+      "conf": 0.3519,
+      "green_pct": 0.0,
+      "yellow_pct": 86.7,
+      "brown_pct": 10.0,
+      "other_pct": 3.3,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 5,
+      "bbox": [
+        197,
+        40,
+        232,
+        74
+      ],
+      "conf": 0.3244,
+      "green_pct": 0.0,
+      "yellow_pct": 99.5,
+      "brown_pct": 0.0,
+      "other_pct": 0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 6,
+      "bbox": [
+        115,
+        115,
+        161,
+        156
+      ],
+      "conf": 0.3215,
+      "green_pct": 0.0,
+      "yellow_pct": 94.5,
+      "brown_pct": 2.8,
+      "other_pct": 2.7,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 7,
+      "bbox": [
+        177,
+        40,
+        213,
+        76
+      ],
+      "conf": 0.2967,
+      "green_pct": 0.0,
+      "yellow_pct": 98.9,
+      "brown_pct": 0.7,
+      "other_pct": 0.4,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 8,
+      "bbox": [
+        270,
+        104,
+        296,
+        127
+      ],
+      "conf": 0.289,
+      "green_pct": 0.0,
+      "yellow_pct": 84.6,
+      "brown_pct": 11.8,
+      "other_pct": 3.6,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 9,
+      "bbox": [
+        153,
+        40,
+        190,
+        79
+      ],
+      "conf": 0.2869,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.2,
+      "other_pct": -0.2,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 10,
+      "bbox": [
+        165,
+        154,
+        214,
+        200
+      ],
+      "conf": 0.2753,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.0,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 11,
+      "bbox": [
+        246,
+        110,
+        274,
+        137
+      ],
+      "conf": 0.274,
+      "green_pct": 0.0,
+      "yellow_pct": 99.0,
+      "brown_pct": 0.0,
+      "other_pct": 1.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 12,
+      "bbox": [
+        221,
+        121,
+        246,
+        144
+      ],
+      "conf": 0.2473,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.0,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 13,
+      "bbox": [
+        104,
+        39,
+        161,
+        85
+      ],
+      "conf": 0.2308,
+      "green_pct": 0.0,
+      "yellow_pct": 99.7,
+      "brown_pct": 3.4,
+      "other_pct": -3.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 14,
+      "bbox": [
+        175,
+        129,
+        199,
+        160
+      ],
+      "conf": 0.2124,
+      "green_pct": 0.0,
+      "yellow_pct": 98.2,
+      "brown_pct": 3.9,
+      "other_pct": -2.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 15,
+      "bbox": [
+        235,
+        37,
+        280,
+        70
+      ],
+      "conf": 0.1995,
+      "green_pct": 0.0,
+      "yellow_pct": 78.9,
+      "brown_pct": 9.0,
+      "other_pct": 12.1,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 16,
+      "bbox": [
+        219,
+        39,
+        244,
+        73
+      ],
+      "conf": 0.1829,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.0,
+      "other_pct": 0.0,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    },
+    {
+      "id": 17,
+      "bbox": [
+        199,
+        148,
+        224,
+        188
+      ],
+      "conf": 0.17,
+      "green_pct": 0.0,
+      "yellow_pct": 100.0,
+      "brown_pct": 0.5,
+      "other_pct": -0.5,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Ripe",
+    "avg_ripeness_pct": 83.9,
+    "avg_green": 0.0,
+    "avg_yellow": 95.1,
+    "avg_brown": 3.1
+  },
+  "seconds": 0.14
+}

@@ -50,15 +50,15 @@ def test_dim_yellow_still_yellow():
 
 
 def test_brown_spot_is_dark_relative_to_crop():
-    # Ripe crop with a dark 10% spot: 90% bright yellow (V=180), 10% dark
-    # brown (V=60, H=20). The spot must land in brown, not vanish.
+    # Ripe crop with a dark 20% spot: 80% bright yellow (V=180), 20% dark
+    # brown (V=45, H=20) -> V=45 < 0.3 x p95(180)=54 -> brown.
     hsv = _hsv(22, 150, 180)
-    hsv[:8] = np.array([20, 90, 60], dtype=np.uint8)   # top rows = spot
+    hsv[:8] = np.array([20, 90, 45], dtype=np.uint8)   # top rows = spot
     v_ref = compute_v_ref(hsv, None)
     c = family_counts(hsv, None, v_ref)
     assert c["brown"] > 0
     assert c["yellow"] < 1600
-    assert c["brown"] + c["yellow"] + c["green"] <= c["total"]  # exclusive
+    assert c["brown"] + c["yellow"] + c["green"] + c["other"] == c["total"]  # exclusive
 
 
 def test_uniform_ripe_crop_has_low_brown():

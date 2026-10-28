@@ -1,0 +1,81 @@
+{
+  "image": "240_F_2190749496_4ixxK8FK8592ixkdFzldzJ43Y1YG3byB.jpg",
+  "n_detections": 4,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        98,
+        46,
+        230,
+        138
+      ],
+      "conf": 0.7537,
+      "green_pct": 91.4,
+      "yellow_pct": 7.0,
+      "brown_pct": 1.1,
+      "other_pct": 0.5,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        217,
+        47,
+        345,
+        134
+      ],
+      "conf": 0.7475,
+      "green_pct": 93.7,
+      "yellow_pct": 4.4,
+      "brown_pct": 0.7,
+      "other_pct": 1.3,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        210,
+        121,
+        343,
+        207
+      ],
+      "conf": 0.7107,
+      "green_pct": 93.9,
+      "yellow_pct": 4.1,
+      "brown_pct": 0.9,
+      "other_pct": 1.2,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        67,
+        103,
+        212,
+        206
+      ],
+      "conf": 0.5918,
+      "green_pct": 90.1,
+      "yellow_pct": 8.5,
+      "brown_pct": 0.8,
+      "other_pct": 0.6,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "unripe",
+    "decision": "Approved",
+    "ripeness_stage": "Unripe",
+    "avg_ripeness_pct": 19.8,
+    "avg_green": 92.3,
+    "avg_yellow": 6.0,
+    "avg_brown": 0.9
+  },
+  "seconds": 0.43
+}
