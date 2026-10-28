@@ -100,14 +100,15 @@ The ESP-32 sends a JSON payload:
 | Component | Status | Notes |
 |-----------|--------|-------|
 | `app.py` | **Done** | Streamlit UI with sidebar, image upload, color breakdown, verdict display |
-| `vision/color_analyzer.py` | **Done** | HSV color segmentation (green/yellow/brown), per-banana analysis, annotations |
+| `vision/color_analyzer.py` | **Done** | Color analysis via `vision/color_model.py` (lighting-invariant families + relative brown gate), per-banana analysis, annotations |
+| `vision/color_model.py` | **Done** | Single source of truth for color semantics: exclusive families (warm H0–34 / green H35–85) + relative brightness gate `brown = V ≤ 0.3 × p95(V of crop)`. Replaces the old absolute `HSV_RANGES` (deleted) that double-counted warm-lit pixels and broke under lighting change. Calibrated on the 154-image gate (0.30 measured optimum; agreement 20% → 57%). |
 | `fusion/fusion_engine.py` | **Done** | Gas + color fusion engine with semi-ripe classification |
 | `sensor/gas_reader.py` | **Done** | MCP-9964 ethylene reader (demo mode + serial mode) |
 | `utils/image_utils.py` | **Done** | Crop, annotate, color conversion utilities |
 | `bunch_analyzer.py` | **Done** | Orchestrates detection → color analysis → fusion |
 | Semi-ripe classification | **Done** | Detects mid-ripening when green + yellow both present |
 | Detection fallback | **Done** | 3-pass detection (YOLO → CLAHE enhanced → all-class fallback) |
-| Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) before HSV, so stand/crate/other-banana colors don't skew ripeness |
+| Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) using `color_model`-derived windows (dim-aware: no V floor on isolation), so stand/crate/other-banana colors don't skew ripeness |
 | Adaptive detection | **Done** | Infer at 0.10 → relative score filter (max(best×0.30, 0.08)) → score-ordered NMS (IoU 0.5). UI has Auto mode (no floor) / Manual mode (threshold = floor) |
 | Blind-batch verification | **Done** | `main/blind_batch.py` — runs the live pipeline (auto mode) on the held-out Roboflow set (`main/models/Training`, 763 images, 3-class polygon labels: 0=overripe 1=ripe 2=underripe) and scores detection recall + ripeness agreement vs. the human labels. 20-image smoke report at `main/tests/blind_batch_report.md` (mean recall 66%, ripeness agreement 42%). Non-teachable — it *measures*, never trains. |
 
@@ -116,6 +117,7 @@ The ESP-32 sends a JSON payload:
 | Component | Status | Notes |
 |-----------|--------|-------|
 | **Non-teachable detection** | **TODO** | Replace YOLO with contour-based detection |
+| **Approach A — reference-patch normalization** | **BLOCKED on hardware** | `choose.md`: white reference patch + diffuser + locked WB/exposure on the ESP-32/OV2640 (camera not built yet; app currently runs on static uploads). Software side (~40-line per-channel gain step into `vision/color_model.py`) can be built config-gated and unit-tested on synthetic patches, but is untestable on real light until the enclosure lands. Closes the known B limit: uniformly-dull overripe bananas read ripe (relative gate has no absolute reference). |
 | **DHT-11 sensor integration** | **TODO** | Update gas_reader.py for temp/humidity |
 | **ESP-32 communication** | **TODO** | HTTP endpoint or serial reader for ESP-32 data |
 | **Morphological cleanup** | **TODO** | Noise removal pipeline for contour detection |
@@ -176,13 +178,24 @@ Input Image
          Individual Banana Results
 ```
 
-### HSV Color Thresholds
+### Color families (as implemented — `vision/color_model.py`)
+
+The absolute `HSV_RANGES` were removed. Color is now classified with
+**exclusive** families (a pixel is counted in at most one) and a
+**relative** brightness gate, so the result is stable under dim / warm
+lighting. This is Approach B from `choose.md`.
 
 ```
-GREEN (unripe):   H: 35-85,   S: 40-255, V: 40-255
-YELLOW (ripe):    H: 15-35,   S: 40-255, V: 40-255
-BROWN (overripe): H: 0-15,    S: 20-100, V: 30-180
+WARM   (ripe + overripe):  H 0–34,  S ≥ 30, V ≥ 15
+GREEN  (unripe):          H 35–85, S ≥ 30, V ≥ 15        # bands do not touch
+brown  = warm ∧ V ≤ 0.3 × p95(V of the analyzed crop)     # relative
+yellow = warm ∧ V >  0.3 × p95(V of the analyzed crop)
 ```
+
+`p95(V)` is computed per crop, so the brown/yellow split is exposure-
+invariant. Known B limit: a uniformly-dull dark banana has p95 = its own
+dark level, so nothing is "dark relative" → reads ripe (Approach A closes
+this).
 
 ### Semi-Ripe Classification (Per Banana)
 
@@ -376,8 +389,10 @@ processing/bunch_analyzer.py              # Bunch-level aggregation
 sensor/gas_reader.py                      # DHT-11 / MQ-135 reader (demo + serial modes)
 tests/                                    # pytest suites + blind-batch reports
 utils/image_utils.py                      # Crop, annotate, color conversion
-vision/color_analyzer.py                  # HSV color segmentation + ripeness classes
-vision/banana_mask.py                     # Center-touching body mask (background suppression)
+vision/color_analyzer.py                  # Per-banana color analysis (consumes color_model) + ripeness classes
+vision/color_model.py                     # Source of color truth: exclusive families + relative brown gate (lighting-invariant, Approach B)
+vision/banana_mask.py                     # Center-touching body mask (background suppression; color_model windows)
+tests/verify_images.py                    # Run the live pipeline on ANY image folder → per-image JSON (boxes + G/Y/B% + class) + annotated PNGs (accepts .jfif)
 models/Training/                          # 763-image Roboflow ground-truth dataset
 ```
 
@@ -488,7 +503,12 @@ When the system detects objects that score LOW on confidence:
 
 ### Why It Matters
 
-The current implementation is banana-specific: HSV thresholds, ripeness stages, shape filters, and fusion rules are all hardcoded for bananas. Adding another fruit currently requires code changes. This must change.
+The current implementation is banana-specific: color families (now in
+`vision/color_model.py`), ripeness stages, shape filters, and fusion rules
+are hardcoded for bananas. Adding another fruit currently requires code
+changes. This must change — and `color_model.py` is the natural seam: its
+family definitions + relative gate are the piece that would become a
+per-fruit profile (see `choose.md` for the lighting-robustness context).
 
 ### Fruit Profile System
 
@@ -585,4 +605,5 @@ This is Round 2/3 scope. The architecture must support it, but full multi-fruit 
 |----------|-------------|-----|
 | Adaptive detection | Fixed confidence threshold | One threshold can't fit all images (occluded bananas vs. duplicate boxes). We infer at 0.10, then filter by the image's own best score + NMS. |
 | Banana-mask color analysis | Whole-box pixel average | Background (green stand, yellow shelf) used to skew ripeness. Now we mask to the banana body (center-touching component) before HSV. |
+| Lighting-invariant color model (B) | Absolute `HSV_RANGES` | Absolute V gates + overlapping hue windows double-counted a warm-lit ripe pixel as both yellow and brown, firing the overripe gate. Now `vision/color_model.py` gives exclusive families + a relative brown gate; ratio measured on the 154-image gate. |
 | Detection as a floor, not a cutoff | Hard confidence cutoff | The user's threshold removes only boxes *below* the floor after relative filtering — weak-but-real bunches on clean images still survive. |
