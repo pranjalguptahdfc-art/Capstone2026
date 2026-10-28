@@ -1,0 +1,81 @@
+{
+  "image": "240_F_2190749496_4ixxK8FK8592ixkdFzldzJ43Y1YG3byB.jpg",
+  "n_detections": 4,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        98,
+        46,
+        230,
+        138
+      ],
+      "conf": 0.7537,
+      "green_pct": 89.5,
+      "yellow_pct": 8.0,
+      "brown_pct": 1.0,
+      "other_pct": 1.5,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 2,
+      "bbox": [
+        217,
+        47,
+        345,
+        134
+      ],
+      "conf": 0.7475,
+      "green_pct": 92.4,
+      "yellow_pct": 12.5,
+      "brown_pct": 0.7,
+      "other_pct": -5.6,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 3,
+      "bbox": [
+        210,
+        121,
+        343,
+        207
+      ],
+      "conf": 0.7107,
+      "green_pct": 92.8,
+      "yellow_pct": 12.3,
+      "brown_pct": 0.6,
+      "other_pct": -5.7,
+      "dominant_color": "green",
+      "ripeness_class": "unripe"
+    },
+    {
+      "id": 4,
+      "bbox": [
+        67,
+        103,
+        212,
+        206
+      ],
+      "conf": 0.5918,
+      "green_pct": 51.8,
+      "yellow_pct": 61.5,
+      "brown_pct": 7.6,
+      "other_pct": -20.9,
+      "dominant_color": "semi-ripe",
+      "ripeness_class": "semi-ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "SEMI-RIPE",
+    "color_signal": "semi-ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Semi-Ripe",
+    "avg_ripeness_pct": 34.8,
+    "avg_green": 81.6,
+    "avg_yellow": 23.6,
+    "avg_brown": 2.5
+  },
+  "seconds": 0.46
+}

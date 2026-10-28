@@ -1,0 +1,33 @@
+{
+  "image": "Ripe_yellow_banana_bunch_2K_20260919231157.jpeg",
+  "n_detections": 1,
+  "detections": [
+    {
+      "id": 1,
+      "bbox": [
+        588,
+        216,
+        1935,
+        1335
+      ],
+      "conf": 0.9213,
+      "green_pct": 0.0,
+      "yellow_pct": 99.8,
+      "brown_pct": 19.0,
+      "other_pct": -18.8,
+      "dominant_color": "yellow",
+      "ripeness_class": "ripe"
+    }
+  ],
+  "bunch": {
+    "bunch_status": "ACCEPTABLE",
+    "color_signal": "ripe",
+    "decision": "Approved",
+    "ripeness_stage": "Ripe",
+    "avg_ripeness_pct": 100.0,
+    "avg_green": 0.0,
+    "avg_yellow": 99.8,
+    "avg_brown": 19.0
+  },
+  "seconds": 0.25
+}
