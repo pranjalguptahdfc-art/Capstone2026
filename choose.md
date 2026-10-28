@@ -7,6 +7,12 @@
 > **A is pending — it is hardware-gated** (the white reference patch and the
 > locked-WB camera don't exist yet; there is no camera code, the app runs on
 > static uploads). **C is parked.** See `progress.md` for the numbers.
+>
+> **(Same evening, out of scope for this sheet):** a **gated slice-boost
+> detection layer** (overlapping-tile inference, `detection/banana_detector.py`)
+> fixed far-distance bunches — the 335×597 truck image went 4 → 9 detections
+> while close-range images stay bit-identical. Plus analytics-nav crash fix +
+> button centering. Details in `progress.md` / `learn/project-notes.md`.
 
 Context: controlled enclosure + own LEDs, and we may co-design the optics with the
 hardware team. Problem being attacked: `color_analyzer.py` thresholds are absolute

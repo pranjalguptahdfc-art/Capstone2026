@@ -1,5 +1,33 @@
 # BananaRipeness — Progress (as of 2026-10-28)
 
+## Slice boost + analytics-nav fixes (uncommitted, 2026-10-28)
+
+Far-distance bunches (small photos, e.g. the 335×597 truck image) were
+detecting only 4 bananas because YOLO's 640×640 input downsamples the bunch
+below its localization limit. Added a **gated slice-boost detection layer**
+(non-teachable, no retraining) plus three UI fixes:
+
+| Area | Change | Measured effect |
+|---|---|---|
+| `detection/banana_detector.py` | `generate_slices` (3×3 overlapping tiles, 25% overlap), `should_slice` gate, `slice_candidates` (tile inference + box mapping), wired into `detect()` | far image `images.jfif`: **4 → 9 detections**, verdict HIGH RISK/Denied → ACCEPTABLE/Approved |
+| same, gate | fires ONLY when full-frame best conf **< 0.35** AND longest side **≤ 1024px** | the 4 close-range test images (best conf 0.58–0.73) are **byte-identical** to pre-change results (JSON diff: 4× IDENTICAL) — regression guard |
+| `app.py` | `StreamlitWidgetAlreadyInstantiatedError` crash on "View Analytics": `st.session_state["app_nav"]` was written after the radio was instantiated. Now an `on_click=_goto_analytics` callback (runs pre-rerun, before the radio re-instantiates) | verified end-to-end in a real browser (Playwright Chromium) — navigation lands on Analytics with no exception |
+| `app.py` | "View Analytics" button re-centered under the stat-card row (`[3,2,3]` columns, `width="stretch"`) | button center measured 850px on 1400px viewport ≈ content-area center |
+| `app.py` | uploader accepted `.jfif` (was `jpg/jpeg/png` only — the project's own test images are `.jfif`) | `.jfif` upload no longer rejected |
+| `app.py` + `analytics_view.py` | `use_container_width` → `width` (Streamlit 1.63 deprecation) | 0 deprecation warnings from the app |
+
+New tests: `main/tests/test_slice_gate_integration.py` (4, model-free fake
+detector asserting exact inference-call counts per gate branch) and
+`main/tests/test_app_navigation.py` (3: crash-mechanism repro, safe
+callback pattern, real-app end-to-end nav via `AppTest`). 8 new gate/geometry
+cases in `test_adaptive_detection.py`. Full suite: **67/67 green**.
+Screenshots: `main/tests/verify_ui/`; regression proof:
+`main/tests/verify_before_slice/` vs `verify_after_slice/`.
+
+**Rollback point for this round: git tag `rollback` = `a928f1b`.**
+(`git checkout rollback` returns the pre-slice state; `git status` then
+shows only untracked test files to delete.)
+
 ## Where this version is (`main` @ `4b76d58`+ = lighting-invariant color B; rollback tag `checkpoint-before-accuracy-work` = `172b1f0`)
 
 Original non-teachable pipeline + verification tooling + **lighting-
@@ -85,14 +113,16 @@ imported by `app.py`). Test images live at the repo root: 6 originals
 
 | Where | Commit |
 |---|---|
-| `main` (local) | `f7c0cb7` — lighting-invariant color B + verify harness + conftest |
-| pre-B checkpoint | tag `checkpoint-before-accuracy-work` = `172b1f0` (rollback point) |
-| `main`'s parent (pre-B) | `eaa62e6` — merge: 30-day analytics dashboard + inspection logging |
+| `main` (local) | `a928f1b` — torch-preload fix (c10.dll) + analytics dashboard + color B |
+| pre-slice-boost checkpoint | tag `rollback` = `a928f1b` (rollback point for the slice-boost round) |
+| pre-B checkpoint | tag `checkpoint-before-accuracy-work` = `172b1f0` |
 
-Test suites: `python -m pytest main/tests/ -q` → 52/52 green (needs
+Test suites: `python -m pytest main/tests/ -q` → 67/67 green (needs
 `conftest.py`'s torch preload on this Windows machine). Standalone runners:
 `python main/tests/test_blind_batch.py`, `test_color_model.py`,
-`test_color_analyzer.py`, `test_banana_mask.py`, `test_verify_images.py`.
+`test_color_analyzer.py`, `test_banana_mask.py`, `test_verify_images.py`,
+`test_adaptive_detection.py`, `test_slice_gate_integration.py`,
+`test_app_navigation.py` (fast 2 + one slow end-to-end).
 
 ## Blind-batch results (this version, `color_model` B)
 
@@ -126,8 +156,12 @@ misreads dropped 6→2 (the target bug). Per-image + confusion tables:
 2. **Detector work stream** — 615 spurious/overlapping boxes on the 154 set;
    the `fix/nested-box-removal` branch + contour-based detection are the
    planned paths. Measure with `python main/blind_batch.py --all`.
-3. **Manual UI spot-check** — `streamlit run main/app.py` on the root test
-   images (11 now, incl. the `.jfif` files).
+   (The slice boost *reduces* far-distance misses but does not touch
+   spurious-box count on close-range images — that's a separate stream.)
+3. ~~**Manual UI spot-check**~~ — done this round via
+   `python main/tests/verify_ui_button.py` (Playwright/Chromium): `.jfif`
+   upload accepted, results render, "View Analytics" centered + crash-free
+   navigation. Screenshots in `main/tests/verify_ui/`.
 4. **Lighting-stress set** — photograph the same bananas at ~3500K / ~5000K /
    dim (~0.3×) and run `python main/tests/verify_images.py` on the folder
    (that's the tool this round was built to feed).
@@ -138,12 +172,13 @@ misreads dropped 6→2 (the target bug). Per-image + confusion tables:
 
 ```
 cd "D:\Pranjal Files\Capstone2026\BananaRipeness"
-git log --oneline -6            # f7c0cb7 = main (color B)
-git tag -l                      # checkpoint-before-accuracy-work = 172b1f0
+git log --oneline -6            # a928f1b = main (color B + torch preload)
+git tag -l                      # rollback = a928f1b (pre-slice-boost); checkpoint-before-accuracy-work = 172b1f0
 python main/blind_batch.py      # 20-image smoke (default)
 python main/blind_batch.py --all   # full 154-image gate (~4 min CPU)
 python main/tests/verify_images.py # run the user's root test images
-python -m pytest main/tests/ -q    # 52 tests
+python -m pytest main/tests/ -q    # 67 tests
+python main/tests/verify_ui_button.py  # real-browser (Playwright) nav + alignment check
 ```
 
 ## Open notes

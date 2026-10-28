@@ -110,6 +110,8 @@ The ESP-32 sends a JSON payload:
 | Detection fallback | **Done** | 3-pass detection (YOLO → CLAHE enhanced → all-class fallback) |
 | Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) using `color_model`-derived windows (dim-aware: no V floor on isolation), so stand/crate/other-banana colors don't skew ripeness |
 | Adaptive detection | **Done** | Infer at 0.10 → relative score filter (max(best×0.30, 0.08)) → score-ordered NMS (IoU 0.5). UI has Auto mode (no floor) / Manual mode (threshold = floor) |
+| Slice-boost detection (far-distance) | **Done** | Gated overlapping-tile inference in `banana_detector.py`: `generate_slices` (3×3 tiles, 25% overlap) + `should_slice` gate (fires only when full-frame best conf **< 0.35** AND longest side **≤ 1024px**) + `slice_candidates` (map boxes back to original coords), merged into `detect()` before the existing filter+NMS. Far-distance bunches: the 335×597 truck image went **4 → 9 detections**; close-range images are **bit-identical** (gate off → slice path never runs). No retraining. |
+| Analytics navigation + UI polish | **Done** | "View Analytics" crash (`StreamlitWidgetAlreadyInstantiatedError`) fixed via an `on_click` callback (`_goto_analytics` in `app.py`, which runs pre-rerun — the Streamlit-safe way to switch pages); button re-centered under the stat cards; uploader now accepts `.jfif`; `use_container_width` → `width` (Streamlit 1.63). Verified end-to-end in a real browser (`tests/verify_ui_button.py`). |
 | Blind-batch verification | **Done** | `main/blind_batch.py` — runs the live pipeline (auto mode) on the held-out Roboflow set (`main/models/Training`, 763 images, 3-class polygon labels: 0=overripe 1=ripe 2=underripe) and scores detection recall + ripeness agreement vs. the human labels. 20-image smoke report at `main/tests/blind_batch_report.md` (mean recall 66%, ripeness agreement 42%). Non-teachable — it *measures*, never trains. |
 
 ### Remaining
@@ -382,7 +384,7 @@ Use: pyserial library
 app.py                                    # Streamlit UI — entry point
 bunch_analyzer.py                         # Legacy orchestrator (duplicate of processing/)
 classification/ripeness_classifier.py     # LEGACY dead code — not used by app.py
-detection/banana_detector.py              # YOLOv8n (pre-built COCO, class 46) + adaptive filter + NMS
+detection/banana_detector.py              # YOLOv8n (pre-built COCO, class 46) + adaptive filter + NMS + gated slice boost for far-distance bunches
 blind_batch.py                            # Held-out verification runner vs. models/Training labels
 fusion/fusion_engine.py                   # Gas + color fusion → bunch verdict
 processing/bunch_analyzer.py              # Bunch-level aggregation
@@ -425,7 +427,9 @@ The only "ML dependency" (ultralytics) runs a pre-built pre-trained detector;
 |--------|---------------|
 | `test_blind_batch.py` (12) | Label parsing, polygon→bbox, IoU matching, class mapping for the runner |
 | `test_background_resilience.py` (6) | Synthetic banana+background images: mask isolation, same-color background, green banana still unripe |
-| `test_adaptive_detection.py` (5) | Relative score filter + NMS dedup on crafted detections |
+| `test_adaptive_detection.py` (13) | Relative score filter + NMS dedup + slice-boost gate & tile geometry |
+| `test_slice_gate_integration.py` (4) | Model-free fake detector: exact inference-call counts per gate branch (strong/small, weak/small, weak/large, gate boundary) |
+| `test_app_navigation.py` (3) | The analytics-nav crash mechanism, the safe `on_click` pattern, and real-app end-to-end navigation via `AppTest` |
 | `test_pipeline.py` (6) | Full pipeline structure: detector loading, classifier interface, crop/annotate utilities, bunch logic |
 | `test_bunch_logic.py` (standalone) | BunchAnalyzer majority/scoring on mock results |
 
@@ -440,6 +444,10 @@ The only "ML dependency" (ultralytics) runs a pre-built pre-trained detector;
 - Upload a market photo → verify per-banana breakdown + bunch verdict
 - Simulate DHT-11 readings at different temp/humidity → verify status changes
 - Edge case: single banana, dark photo, overlapping bananas, fully rotten banana
+- Real-browser UI check: `python main/tests/verify_ui_button.py`
+  (Playwright/Chromium — upload a `.jfif`, assert results render, "View
+  Analytics" is centered and navigating to the Analytics page raises no
+  exception; screenshots in `main/tests/verify_ui/`)
 
 ---
 
@@ -607,3 +615,4 @@ This is Round 2/3 scope. The architecture must support it, but full multi-fruit 
 | Banana-mask color analysis | Whole-box pixel average | Background (green stand, yellow shelf) used to skew ripeness. Now we mask to the banana body (center-touching component) before HSV. |
 | Lighting-invariant color model (B) | Absolute `HSV_RANGES` | Absolute V gates + overlapping hue windows double-counted a warm-lit ripe pixel as both yellow and brown, firing the overripe gate. Now `vision/color_model.py` gives exclusive families + a relative brown gate; ratio measured on the 154-image gate. |
 | Detection as a floor, not a cutoff | Hard confidence cutoff | The user's threshold removes only boxes *below* the floor after relative filtering — weak-but-real bunches on clean images still survive. |
+| Gated slice boost for far-distance bunches | Always-on slicing, or upscaling | Distant bunches (small photos) get downsampled by YOLO's 640×640 input below its localization limit. Slicing helps (each banana fills more of a tile's input) but naively slicing every image triples box counts and flips verdicts — so the gate fires **only** when the full-frame read is weak (best conf < 0.35) *and* the image is small (≤ 1024px). Working close-range images never slice → their results are unchanged by construction, not just measured. |
