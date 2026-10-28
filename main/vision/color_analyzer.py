@@ -7,15 +7,18 @@ No ML model — just OpenCV color thresholding.
 Analyzes each detected banana region and classifies it as green (unripe),
 yellow (ripe), or brown (overripe) based on pixel percentages.
 
-HSV Thresholds:
-  Green  (unripe)  : H 35-85,  S 30-255, V 30-255
-  Yellow (ripe)    : H 15-35,  S 30-255, V 80-255
-  Brown  (overripe): H  0-25,  S 10-200, V 20-200
+Color families are exclusive and use a lighting-invariant, relative
+brightness gate (see vision/color_model.py): a pixel is never counted in
+more than one family, and the brown/yellow split is relative to the crop's
+own brightness (p95 of V), so classification stays stable under dim or
+warm lighting.
 """
 
 import cv2
 import numpy as np
 from typing import Optional
+
+from .color_model import compute_v_ref, family_counts
 
 
 # ── HSV thresholds ──────────────────────────────────────────────────────────
@@ -100,12 +103,7 @@ def analyze_region(
         empty["background_suppressed"] = background_suppressed
         return empty
 
-    counts = {}
-    for color_name, hsv_dict in HSV_RANGES.items():
-        in_range = cv2.inRange(hsv, hsv_dict["lower"], hsv_dict["upper"])
-        if pixel_mask is not None:
-            in_range = cv2.bitwise_and(in_range, pixel_mask)
-        counts[color_name] = int(np.count_nonzero(in_range))
+    counts = family_counts(hsv, pixel_mask, compute_v_ref(hsv, pixel_mask))
 
     green_pct = round(counts["green"] / total * 100, 1)
     yellow_pct = round(counts["yellow"] / total * 100, 1)
@@ -121,7 +119,11 @@ def analyze_region(
         dominant_color = "semi-ripe"
         ripeness_class = "semi-ripe"
     else:
-        dominant_color = max(counts, key=counts.get)
+        # Exclusive families: pick the most-present COLOR family only
+        # (counts also carries "total", which must not be considered).
+        dominant_color = max(
+            ("green", "yellow", "brown"), key=lambda c: counts[c]
+        )
         ripeness_class = COLOR_TO_RIPENESS.get(dominant_color, "unknown")
 
     return {
