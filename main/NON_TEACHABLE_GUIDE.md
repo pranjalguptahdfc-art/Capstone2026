@@ -2,7 +2,10 @@
 
 ## Project Context
 
-> This is a **capstone competition** project. A working prototype must be demonstrated to the evaluator/teacher.
+> This is a **capstone competition** project. A working software prototype
+> was demonstrated to the evaluator on **Nov 4, 2026**. The detection
+> scope is frozen at commit `b66a0b6` (81/81 tests green, COCO YOLOv8n
+> fallback model + non-teachable post-processing layers).
 
 ### Rounds
 
@@ -19,9 +22,31 @@
 | **Hardware team** | Building the ESP-32 prototype (camera, DHT-11, wiring, power, enclosure) |
 | **Software team** (you) | Detection accuracy, color analysis, sensor fusion, UI — everything that runs on this machine |
 
-### Current Priority
+### Current Phase (post-demo, 2026-10-29 onward): hardware integration
 
-The hardware prototype is being built in parallel. Until it arrives, the **sole focus is the detection software** — making it as accurate as possible so it works reliably the moment the hardware is connected. Do not build UI for ESP-32 integration yet; keep the software working with image uploads and simulated sensor data for now.
+The software scope is **frozen** for the demo. The next phase connects the
+ESP-32 hardware and follows a fixed handoff workflow (full plan in
+`progress.md`, "Hardware integration plan"):
+
+1. **Software → CSV**: the per-banana ripeness table (yellow/green/brown %
+   + ripe/unripe/semi-ripe) is downloaded automatically as CSV.
+   *[Planned — today the table is display-only (`app.py` `st.dataframe`);
+   the automated CSV download is not yet built.]*
+2. **Hardware → calibration in-repo**: the hardware side reads and
+   calibrates the gas sensor values and hands them to this software,
+   which performs the calibration and updates `analytics_view.py`.
+3. **Software → ESP32 LCD**: the final verdict renders as a **one-line
+   summary** on the LCD, e.g. *"Acceptable, all banana bunches are mostly
+   ripe. Few bananas will take 1 day to ripen."*
+
+Until the enclosure lands, the app runs on static uploads and the
+simulated gas reader (`sensor/gas_reader.py` demo mode) — the demo was
+shown exactly this way.
+
+**Documented post-demo follow-up round (not in demo scope):** retraining
+one YOLO model on a combined close + far + far-crop dataset to lift the
+far-distance ceiling of the COCO fallback. The non-teachable layers
+(shipped in `b66a0b6`) already recover what the fallback can still see.
 
 ### Multi-Fruit Support
 
@@ -111,6 +136,7 @@ The ESP-32 sends a JSON payload:
 | Background-resilient ripeness | **Done** | `vision/banana_mask.py` — masks to the banana body (center-touching component) using `color_model`-derived windows (dim-aware: no V floor on isolation), so stand/crate/other-banana colors don't skew ripeness |
 | Adaptive detection | **Done** | Infer at 0.10 → relative score filter (max(best×0.30, 0.08)) → score-ordered NMS (IoU 0.5). UI has Auto mode (no floor) / Manual mode (threshold = floor) |
 | Slice-boost detection (far-distance) | **Done** | Gated overlapping-tile inference in `banana_detector.py`: `generate_slices` (3×3 tiles, 25% overlap) + `should_slice` gate (fires only when full-frame best conf **< 0.35** AND longest side **≤ 1024px**) + `slice_candidates` (map boxes back to original coords), merged into `detect()` before the existing filter+NMS. Far-distance bunches: the 335×597 truck image went **4 → 9 detections**; close-range images are **bit-identical** (gate off → slice path never runs). No retraining. |
+| Far-band rescue + containment dedup | **Done** | Gated far-band crop pass in `banana_detector.py`: `far_band_gate` (fires only when the top 50% of the frame has **no** box centers AND longest side ≤ 1024px) → `far_band_candidates` crops the top band and runs one extra YOLO pass; far boxes clear only `FAR_BAND_FLOOR=0.10`, exempt from the relative-against-best filter, merged through NMS + containment. `images.jfif`: **9 → 10 boxes** (verified proof image `main/tests/verify_ui/images_jfif_farband_rescue.png`, re-render with `python main/tests/verify_farband_boxes.py`). Plus `discard_contained` (always on after NMS): drops a box fully inside a stronger-or-equal kept box — removes the "big crate box + small banana box" overlap; `images (1)/(8).jfif` **14 → 9** each (5 verified drops). Live regression guard: `test_farband_regression.py` diffs real `detect()` against the recorded `baseline_before.json` fixture. |
 | Analytics navigation + UI polish | **Done** | "View Analytics" crash (`StreamlitWidgetAlreadyInstantiatedError`) fixed via an `on_click` callback (`_goto_analytics` in `app.py`, which runs pre-rerun — the Streamlit-safe way to switch pages); button re-centered under the stat cards; uploader now accepts `.jfif`; `use_container_width` → `width` (Streamlit 1.63). Verified end-to-end in a real browser (`tests/verify_ui_button.py`). |
 | Blind-batch verification | **Done** | `main/blind_batch.py` — runs the live pipeline (auto mode) on the held-out Roboflow set (`main/models/Training`, 763 images, 3-class polygon labels: 0=overripe 1=ripe 2=underripe) and scores detection recall + ripeness agreement vs. the human labels. 20-image smoke report at `main/tests/blind_batch_report.md` (mean recall 66%, ripeness agreement 42%). Non-teachable — it *measures*, never trains. |
 
@@ -118,20 +144,30 @@ The ESP-32 sends a JSON payload:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **Non-teachable detection** | **TODO** | Replace YOLO with contour-based detection |
+| **Per-banana table → auto CSV download** | **TODO (hardware phase)** | The ripeness table on image upload is display-only today (`app.py` `st.dataframe`); the plan is to download it automatically as CSV so the hardware side can calibrate gas values against it. Step 1 of the hardware-integration workflow (see "Current Phase" above). |
+| **Gas calibration in-repo** | **TODO (hardware phase)** | The hardware side hands calibrated gas-sensor values to this software, which performs the calibration and updates `analytics_view.py`. Step 2 of the workflow. |
+| **ESP-32 one-line LCD verdict** | **TODO (hardware phase)** | Render the final verdict as a single summary line for the ESP32 LCD, e.g. *"Acceptable, all banana bunches are mostly ripe. Few bananas will take 1 day to ripen."* Step 3 of the workflow. |
+| **Non-teachable detection (far-distance ceiling)** | **TODO (post-demo)** | The planned path is **retraining one YOLO on a combined close + far + far-crop dataset** (the documented alternative is pure-contour detection, which removes the ultralytics dependency). The far-band-rescue + containment layers in `b66a0b6` already recover what the COCO fallback can see. See `progress.md` "Hardware integration plan". |
 | **Approach A — reference-patch normalization** | **BLOCKED on hardware** | `choose.md`: white reference patch + diffuser + locked WB/exposure on the ESP-32/OV2640 (camera not built yet; app currently runs on static uploads). Software side (~40-line per-channel gain step into `vision/color_model.py`) can be built config-gated and unit-tested on synthetic patches, but is untestable on real light until the enclosure lands. Closes the known B limit: uniformly-dull overripe bananas read ripe (relative gate has no absolute reference). |
-| **DHT-11 sensor integration** | **TODO** | Update gas_reader.py for temp/humidity |
+| **DHT-11 sensor integration** | **TODO** | Extend gas_reader.py for temp/humidity |
 | **ESP-32 communication** | **TODO** | HTTP endpoint or serial reader for ESP-32 data |
-| **Morphological cleanup** | **TODO** | Noise removal pipeline for contour detection |
-| **Shape validation** | **TODO** | Aspect ratio and area filtering on contours |
+| **Morphological cleanup** | **TODO** | Noise removal pipeline (if the contour-detection alternative is taken) |
+| **Shape validation** | **TODO** | Aspect ratio and area filtering (if the contour-detection alternative is taken) |
 
 ---
 
 ## Scope: Non-Teachable Pipeline (No ML)
 
-### Detection: Contour-Based Banana Localization
+### Detection: Contour-Based Banana Localization (planned scope — NOT shipped)
 
-Since we cannot use YOLO or any trained model, detection uses **traditional CV**:
+> **Status note (2026-10-29):** this pure-OpenCV detection path was the
+> *planned* scope, but what actually shipped and runs in the app is the
+> **frozen-YOLO + non-teachable post-processing** path: a pre-trained YOLOv8
+> detector (inference only, never retrained) plus the adaptive filter /
+> NMS / slice-boost / far-band-rescue / containment layers described in
+> "Current Progress" above. The contour pipeline below remains the
+> documented alternative for the post-demo detector round (it would remove
+> the ultralytics dependency entirely).
 
 ```
 Input Image
@@ -384,7 +420,7 @@ Use: pyserial library
 app.py                                    # Streamlit UI — entry point
 bunch_analyzer.py                         # Legacy orchestrator (duplicate of processing/)
 classification/ripeness_classifier.py     # LEGACY dead code — not used by app.py
-detection/banana_detector.py              # YOLOv8n (pre-built COCO, class 46) + adaptive filter + NMS + gated slice boost for far-distance bunches
+detection/banana_detector.py              # YOLOv8n (pre-built COCO, class 46) + adaptive filter + NMS + gated slice boost + far-band rescue + containment dedup
 blind_batch.py                            # Held-out verification runner vs. models/Training labels
 fusion/fusion_engine.py                   # Gas + color fusion → bunch verdict
 processing/bunch_analyzer.py              # Bunch-level aggregation
@@ -423,13 +459,15 @@ The only "ML dependency" (ultralytics) runs a pre-built pre-trained detector;
 
 ### Unit Tests
 
-| Suite (run `python -m pytest main/tests/ -q`) | What it covers |
+| Suite (run `python -m pytest main/tests/ -q`, **81 tests**) | What it covers |
 |--------|---------------|
 | `test_blind_batch.py` (12) | Label parsing, polygon→bbox, IoU matching, class mapping for the runner |
 | `test_background_resilience.py` (6) | Synthetic banana+background images: mask isolation, same-color background, green banana still unripe |
 | `test_adaptive_detection.py` (13) | Relative score filter + NMS dedup + slice-boost gate & tile geometry |
 | `test_slice_gate_integration.py` (4) | Model-free fake detector: exact inference-call counts per gate branch (strong/small, weak/small, weak/large, gate boundary) |
 | `test_app_navigation.py` (3) | The analytics-nav crash mechanism, the safe `on_click` pattern, and real-app end-to-end navigation via `AppTest` |
+| `test_farband_containment.py` (11) | Far-band gate fire/stay-off cases + containment-dedup semantics (model-free, fast) |
+| `test_farband_regression.py` (3) | Live: re-runs real `detect()` on the 8 readable reference images and diffs against `baseline_before.json` — working images gain 0 boxes; the far image must gain its far-band box (slow, ~40s) |
 | `test_pipeline.py` (6) | Full pipeline structure: detector loading, classifier interface, crop/annotate utilities, bunch logic |
 | `test_bunch_logic.py` (standalone) | BunchAnalyzer majority/scoring on mock results |
 

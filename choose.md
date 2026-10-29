@@ -26,6 +26,26 @@
 > close-range images verified unchanged. Details in `progress.md` /
 > `learn/project-notes.md`.
 
+> **(Software freeze, 2026-10-29):** detection scope is **frozen for the
+> Nov-4 demo** at commit `b66a0b6` (81/81 tests green). Two follow-up
+> workstreams are documented in `progress.md` ("Hardware integration
+> plan") and are NOT part of this sheet:
+>
+> 1. **Hardware handoff** — per-banana ripeness table → automatic CSV
+>    download → gas-sensor calibration done in-repo against that CSV →
+>    `analytics_view.py` update → one-line verdict summary rendered on the
+>    ESP32 LCD (e.g. *"Acceptable, all banana bunches are mostly ripe.
+>    Few bananas will take 1 day to ripen."*).
+> 2. **Far-distance retraining round** — one YOLO model trained on a
+>    combined close + far + far-crop dataset (labeling via auto-labeling
+>    suggested). Decision recorded: **one combined model**, not two
+>    (close + far) to merge — model weight-averaging is not a valid
+>    operation across differently-shaped networks, and no off-the-shelf
+>    far-banana YOLO exists to download. The frozen app pipeline prefers
+>    `models/banana_detector_single.pt` over the COCO fallback, so a
+>    retrained model drops in with zero app-code changes; it is validated
+>    through the same regression harness before the swap is kept.
+
 Context: controlled enclosure + own LEDs, and we may co-design the optics with the
 hardware team. Problem being attacked: `color_analyzer.py` thresholds are absolute
 HSV values that only hold under one specific light source/exposure.
@@ -117,3 +137,10 @@ PNGs. The B round's before/after on the user's root images lives in
 
 **B-only ✅ (shipped 2026-10-28)** · A+B → later round (pending hardware) ·
 A-only / C → not taken.
+
+**Lighting-axis decision is closed as of the Nov-4 demo (2026-10-29):** B
+stays the color path until the enclosure exists; A+B and C remain the
+post-hardware rounds. The hardware handoff workflow (CSV table → in-repo
+gas calibration → LCD one-liner) and the far-distance retraining decision
+(one combined model, no merging) are recorded above under "Software
+freeze" and in `progress.md`.

@@ -1,6 +1,34 @@
-# BananaRipeness — Progress (as of 2026-10-28)
+# BananaRipeness — Progress (as of 2026-10-29)
 
-## Far-band rescue + containment dedup (uncommitted, 2026-10-28)
+## Hardware integration plan + Nov-4 demo scope (decided 2026-10-29)
+
+Demo target: **Nov 4, 2026**. Detection scope is **frozen** at this point
+(far-band rescue + containment dedup, commit `b66a0b6`). **Not in scope for
+the demo:** retraining on a combined close + far + far-crop YOLO dataset —
+the COCO fallback's far-distance ceiling is documented (it simply doesn't
+know small far bunches; the far-band crop pass recovers what the model can
+still see). The retraining round is the next workstream, **post-demo**.
+
+Hardware handoff workflow (contract with the hardware side, agreed
+2026-10-29):
+
+1. **Software → CSV** — the per-banana ripeness table shown on image
+   upload (yellow/green/brown % + ripe/unripe/semi-ripe) is **downloaded
+   automatically as CSV**. *[Planned — today the table is display-only
+   (`app.py` `st.dataframe`); downloads are manual: annotated PNG +
+   analytics inspection-log CSV.]*
+2. **Hardware → calibration HERE** — the hardware side reads/calibrates
+   the gas sensor values and hands them to this software, which
+   **performs the calibration in-repo** and updates `analytics_view.py`.
+3. **Software → ESP32 LCD** — the final verdict renders as a **one-line
+   summary** on the LCD, e.g.
+   *"Acceptable, all banana bunches are mostly ripe. Few bananas will
+   take 1 day to ripen."*
+
+Plan: push the software state to GitHub now (this docs round completes
+it); hardware calibration happens **after** the software push.
+
+## Far-band rescue + containment dedup (committed b66a0b6, 2026-10-29)
 
 Far-distance photos (`images.jfif`, 335×597 truck) still had **zero boxes in
 the top half of the frame** — the existing slice-boost gate was inert on it
@@ -22,9 +50,10 @@ recorded containment drops; `images.jfif` must gain its far-band box).
 Full suite: **81/81 green**.
 
 **Rollback point for this round: git tag `pre-far-band-rescue` = `0af16ae`.**
-`git checkout pre-far-band-rescue` restores the pre-change state; `rm` the
-untracked test files + `baseline_before.json` + `verify_render.py` /
-`verify_images_jfif_farboxes.png` to fully unwind.
+(`git checkout pre-far-band-rescue` restores the pre-change state. The test
+files + `baseline_before.json` + `verify_farband_boxes.py` +
+`verify_ui/images_jfif_farband_rescue.png` are committed in `b66a0b6`, so a
+plain checkout unwinds everything; no manual `rm` needed.)
 
 ## Slice boost + analytics-nav fixes (committed f784cb0/b9f167c/0af16ae, 2026-10-28)
 
@@ -46,7 +75,9 @@ New tests: `main/tests/test_slice_gate_integration.py` (4, model-free fake
 detector asserting exact inference-call counts per gate branch) and
 `main/tests/test_app_navigation.py` (3: crash-mechanism repro, safe
 callback pattern, real-app end-to-end nav via `AppTest`). 8 new gate/geometry
-cases in `test_adaptive_detection.py`. Full suite: **67/67 green**.
+cases in `test_adaptive_detection.py`. Full suite: **75/75 green** at the
+time of that round (later rounds added the far-band tests, suite now
+81/81).
 Screenshots: `main/tests/verify_ui/`; regression proof:
 `main/tests/verify_before_slice/` vs `verify_after_slice/`.
 
@@ -139,16 +170,21 @@ imported by `app.py`). Test images live at the repo root: 6 originals
 
 | Where | Commit |
 |---|---|
-| `main` (local) | `a928f1b` — torch-preload fix (c10.dll) + analytics dashboard + color B |
-| pre-slice-boost checkpoint | tag `rollback` = `a928f1b` (rollback point for the slice-boost round) |
+| `main` (local) | `b66a0b6` — far-band rescue + containment dedup (software final, pre-push) |
+| pre-far-band-rescue checkpoint | tag `pre-far-band-rescue` = `0af16ae` (rollback point for the far-band round) |
+| pre-slice-boost checkpoint | tag `rollback` = `a928f1b` |
 | pre-B checkpoint | tag `checkpoint-before-accuracy-work` = `172b1f0` |
 
-Test suites: `python -m pytest main/tests/ -q` → 67/67 green (needs
+Test suites: `python -m pytest main/tests/ -q` → 81/81 green (needs
 `conftest.py`'s torch preload on this Windows machine). Standalone runners:
 `python main/tests/test_blind_batch.py`, `test_color_model.py`,
 `test_color_analyzer.py`, `test_banana_mask.py`, `test_verify_images.py`,
 `test_adaptive_detection.py`, `test_slice_gate_integration.py`,
-`test_app_navigation.py` (fast 2 + one slow end-to-end).
+`test_app_navigation.py` (fast 2 + one slow end-to-end),
+`test_farband_containment.py` (11 fast, model-free),
+`test_farband_regression.py` (3 live, ~40s — diffs real `detect()` against
+the recorded `baseline_before.json` fixture; re-record that file if the
+detector model changes).
 
 ## Blind-batch results (this version, `color_model` B)
 
@@ -179,37 +215,50 @@ misreads dropped 6→2 (the target bug). Per-image + confusion tables:
    WB/exposure on the enclosure camera; then a software-only ~40-line
    per-channel gain step feeding `color_model`. This is the round that
    closes the uniformly-dull-overripe gap B can't reach. See `choose.md`.
-2. **Detector work stream** — 615 spurious/overlapping boxes on the 154 set;
-   the `fix/nested-box-removal` branch + contour-based detection are the
-   planned paths. Measure with `python main/blind_batch.py --all`.
-   (The slice boost *reduces* far-distance misses but does not touch
-   spurious-box count on close-range images — that's a separate stream.)
-3. ~~**Manual UI spot-check**~~ — done this round via
+2. **Hardware integration (post-demo workstream)** — gas-sensor CSV
+   handoff → in-repo calibration → `analytics_view.py` update, and the
+   ESP32 one-line LCD verdict (workflow above). See `main/NON_TEACHABLE_GUIDE.md`.
+3. **Detector work stream (post-demo)** — 615 spurious/overlapping boxes
+   on the 154-image set. The nested-duplicate class is now handled
+   (containment dedup, `b66a0b6`); remaining spurious boxes + the
+   far-distance COCO-fallback ceiling are addressed by the planned
+   **retraining round** (combined close + far + far-crop YOLO dataset,
+   one model — see the "Hardware integration plan" section above).
+   Measure with `python main/blind_batch.py --all`.
+4. ~~**Manual UI spot-check**~~ — done via
    `python main/tests/verify_ui_button.py` (Playwright/Chromium): `.jfif`
    upload accepted, results render, "View Analytics" centered + crash-free
    navigation. Screenshots in `main/tests/verify_ui/`.
-4. **Lighting-stress set** — photograph the same bananas at ~3500K / ~5000K /
+5. **Lighting-stress set** — photograph the same bananas at ~3500K / ~5000K /
    dim (~0.3×) and run `python main/tests/verify_images.py` on the folder
    (that's the tool this round was built to feed).
-5. Optional cleanup: remove dead `classification/ripeness_classifier.py` +
-   duplicate `main/bunch_analyzer.py` (needs sign-off).
+6. Optional cleanup: remove dead `classification/ripeness_classifier.py` +
+   duplicate `main/bunch_analyzer.py` (needs sign-off — flagged, not done).
 
 ## How to resume
 
 ```
 cd "D:\Pranjal Files\Capstone2026\BananaRipeness"
-git log --oneline -6            # main = 0af16ae (docs for slice-boost round)
+git log --oneline -6            # main = b66a0b6 (far-band rescue + containment dedup)
 git tag -l                      # rollback = a928f1b; pre-far-band-rescue = 0af16ae; checkpoint-before-accuracy-work = 172b1f0
 python main/blind_batch.py      # 20-image smoke (default)
 python main/blind_batch.py --all   # full 154-image gate (~4 min CPU)
 python main/tests/verify_images.py # run the user's root test images
 python -m pytest main/tests/ -q    # 81 tests
 python main/tests/verify_ui_button.py  # real-browser (Playwright) nav + alignment check
+python main/tests/verify_farband_boxes.py  # re-render the images.jfif far-band proof image
 ```
 
 ## Open notes
-- `choose.md` decision sheet was **executed** this round: B shipped, A held
+- Software scope is **frozen for the Nov-4 demo** (`b66a0b6`); the only
+  planned follow-up rounds are the hardware handoff (CSV → calibration →
+  `analytics_view.py` → ESP32 LCD line) and the far-distance retraining
+  round. Both are documented in the hardware-integration-plan section above.
+- `choose.md` decision sheet was **executed**: B shipped, A held
   for hardware, C parked. Rollback = `git checkout checkpoint-before-
   accuracy-work` (tag `checkpoint-before-accuracy-work`, commit `172b1f0`).
 - The pre-B version in this file is `main` @ `d00ffad` = GitHub (that
   commit + the analytics-dashboard merge `eaa62e6` are the parent chain).
+- Known local-only oddity: a stray **empty `Pranjal/` directory** sits at
+  the repo root (untracked, nothing inside) — flagged for removal, not
+  touched.
