@@ -41,3 +41,10 @@ scratch/
 annotated_*
 runs/
 output/
+
+# Markdown: ignore all .md docs except the non-teachable guide
+*.md
+!main/NON_TEACHABLE_GUIDE.md
+
+# Large verification test artifacts (annotated PNGs + JSON exports)
+main/tests/verify/

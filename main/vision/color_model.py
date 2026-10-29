@@ -28,10 +28,19 @@ WARM_H = (0, 34)         # exclusive: green starts at 35; 0-34 catches
                         # red-tinged brown spots the old brown range had
 MIN_S = 30
 MIN_V = 15
-BROWN_V_RATIO = 0.3      # a warm pixel is "brown" when V ≤ 0.3 × V_ref
-                        # measured optimum on the full 154-image held-out
-                        # gate: 0.30 -> 57% agreement vs 0.40 -> 52%, with
-                        # far fewer ripe/underripe mis-calls as overripe.
+# A warm pixel is "brown" when V ≤ ratio × V_ref. 0.30 was the measured
+# optimum on the 154-image gate (20%→57% agreement), but it only catches
+# near-black pixels — the medium/dark BROWN SKIN of mottled overripe
+# bananas (V ≈ 150–200 on a bright-lit photo) landed above the threshold
+# and was counted YELLOW, so overripe bunches read ripe/semi-ripe. 0.65 is
+# calibrated on the user's demo set (2026-10-29): at 0.65 the mottled
+# overripe bunch produces an overripe box while every working truck bunch
+# produces zero; at 0.70 a shadowed truck banana (S≈243, dark-yellow in
+# shadow, NOT brown skin) crosses over and one truck image regressed to
+# HIGH RISK — so the usable gap is 0.65, and it is narrow. The overripe
+# VERDICT keys off brown dominance (color_analyzer), and the hardware
+# white reference patch (Approach A) is the proper fix for shadow-darkness.
+BROWN_V_RATIO = 0.65
 V_REF_FLOOR = 30.0       # clamps V_ref so a fully-dark crop can't make everything brown
 V_REF_CEIL = 255.0
 

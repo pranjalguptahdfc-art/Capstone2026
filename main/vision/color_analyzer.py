@@ -94,12 +94,20 @@ def analyze_region(
     brown_pct = round(counts["brown"] / total * 100, 1)
     other_pct = round(counts["other"] / total * 100, 1)
 
-    # Brown spots dominate: if >20%, it's overripe regardless of green/yellow
-    if brown_pct > 20:
+    # Brown-DOMINANT crop: the old `brown > 20%` absolute gate misread
+    # mottled overripe bananas, because the brown gate was too narrow and
+    # brown came out at 2-7%. A mottled overripe banana is brown-MAJORITY
+    # (brown out-shares yellow); a ripe banana with brown SPOTS is
+    # yellow-majority. Dominance is the real separator, so it is what the
+    # verdict keys on now.
+    if brown_pct > yellow_pct and brown_pct > green_pct and brown_pct >= 15:
         dominant_color = "brown"
         ripeness_class = "overripe"
-    # Both green and yellow are significant → mid-ripening (semi-ripe)
-    elif green_pct > 20 and yellow_pct > 35:
+    # Widened semi-ripe band: both green and yellow are clearly present,
+    # with green at least 40% of yellow (so a mostly-green banana with a
+    # yellow sliver stays unripe, and a mostly-yellow banana with a green
+    # tip stays ripe).
+    elif green_pct >= 15 and yellow_pct >= 15 and green_pct >= 0.4 * yellow_pct:
         dominant_color = "semi-ripe"
         ripeness_class = "semi-ripe"
     else:

@@ -27,6 +27,7 @@ BRIGHT_YELLOW_BGR = (60, 200, 255)   # saturated ripe yellow
 DIM_YELLOW_BGR = (18, 60, 76)        # ripe yellow at ~0.3× exposure (HSV ~22,194,76)
 BROWN_SPOT_BGR = (12, 38, 60)        # true brown spot on a BRIGHT body (H~30, S~204, V=60)
 NEAR_BLACK_BGR = (5, 15, 15)         # very dark overripe skin / spot
+BROWN_BODY_BGR = (30, 60, 90)        # dark-brown overripe skin (H~12, S~165, V~90)
 GREY_BG_BGR = (120, 120, 120)        # neutral non-warm background (excluded by mask)
 
 
@@ -63,12 +64,74 @@ def test_dim_crop_stays_ripe():
 
 
 def test_spotted_crop_is_overripe():
-    # Bright ripe body + a dark spot in the top third → brown crosses the gate.
+    # Bright ripe body + a brown-dominant spot (half the body, not a
+    # few-pixel fleck) → brown out-shares yellow → overripe.
     r = analyze_region(
-        _scene(BRIGHT_YELLOW_BGR, spot_box=(8, 8, 32, 16),
-               spot_bgr=BROWN_SPOT_BGR), FULL)
-    assert r["brown_pct"] >= 20
+        _scene(BRIGHT_YELLOW_BGR, spot_box=(8, 8, 32, 22),
+               spot_bgr=BROWN_BODY_BGR), FULL)
+    assert r["brown_pct"] > r["yellow_pct"]
     assert r["ripeness_class"] == "overripe"
+
+
+def test_brown_dominant_crop_is_overripe():
+    # Mottled overripe shape: dark-brown skin out-shares the bright yellow
+    # (67% / 33%). The old `brown > 20%` gate missed these because the
+    # brown gate was too narrow; brown DOMINANCE is the actual separator.
+    # The split is deliberately asymmetric so the strict `>` assertions
+    # don't sit on a 50/50 boundary.
+    frame = np.zeros((40, 40, 3), dtype=np.uint8)
+    frame[:] = GREY_BG_BGR
+    frame[8:32, 8:16] = BRIGHT_YELLOW_BGR      # left third: yellow
+    frame[8:32, 16:32] = BROWN_BODY_BGR         # right two-thirds: brown
+    r = analyze_region(frame, FULL)
+    assert r["brown_pct"] > r["yellow_pct"], (
+        f"brown {r['brown_pct']}% must out-share yellow {r['yellow_pct']}%")
+    assert r["ripeness_class"] == "overripe"
+
+
+def test_yellow_dominant_with_brown_spots_stays_ripe():
+    # The guard case (your alamy bunch): mostly bright yellow with brown
+    # spots (~20-30%). Brown must NOT out-share yellow, and there is no
+    # green, so this stays RIPE (not overripe, not semi-ripe).
+    frame = np.zeros((40, 40, 3), dtype=np.uint8)
+    frame[:] = GREY_BG_BGR
+    frame[8:32, 8:32] = BRIGHT_YELLOW_BGR
+    frame[8:12, 8:32] = BROWN_BODY_BGR     # ~17% brown flecks
+    r = analyze_region(frame, FULL)
+    assert r["yellow_pct"] > r["brown_pct"]
+    assert r["ripeness_class"] == "ripe"
+
+
+def test_green_yellow_mix_is_semi_ripe():
+    # Widened semi-ripe band: a mostly-green body with a clear yellow share
+    # reads semi-ripe. (Old rule required green > 20 AND yellow > 35 — a
+    # banana that is ~70% green / ~23% yellow used to fall through to
+    # "unripe".) A central yellow core is used so the mask keeps BOTH
+    # families (the per-family center-touch rule drops a family that does
+    # not touch the crop center, so stacked green/yellow rows would
+    # collapse to one).
+    frame = np.zeros((40, 40, 3), dtype=np.uint8)
+    frame[:] = GREY_BG_BGR
+    green_bgr = (40, 180, 40)
+    frame[8:32, 8:32] = green_bgr
+    frame[14:26, 14:26] = BRIGHT_YELLOW_BGR   # central yellow core
+    r = analyze_region(frame, FULL)
+    assert r["green_pct"] >= 15 and r["yellow_pct"] >= 15, (
+        f"expected a green+yellow mix, got G={r['green_pct']} Y={r['yellow_pct']}")
+    assert r["ripeness_class"] == "semi-ripe"
+
+
+def test_green_dominant_with_tiny_yellow_is_unripe():
+    # All-green banana with a sliver of yellow (< 15%): the widened
+    # band must NOT catch it — unripe stays unripe.
+    frame = np.zeros((40, 40, 3), dtype=np.uint8)
+    frame[:] = GREY_BG_BGR
+    green_bgr = (40, 180, 40)
+    frame[8:32, 8:32] = green_bgr
+    frame[30:32, 8:32] = BRIGHT_YELLOW_BGR  # bottom ~8% yellow
+    r = analyze_region(frame, FULL)
+    assert r["yellow_pct"] < 15
+    assert r["ripeness_class"] == "unripe"
 
 
 def test_green_crop_is_unripe():
