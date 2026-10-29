@@ -56,6 +56,25 @@ SLICE_TILES = 3                # 3x3 overlapping tile grid
 SLICE_OVERLAP = 0.25           # 25% overlap between adjacent tiles
 SLICE_MIN_TILE_PX = 64         # skip tiles smaller than this (below useful input size)
 
+# Containment dedup: a box fully inside another box is a duplicate read of
+# the same bunch (one big crate box + one smaller banana box). The inner
+# box is discarded, but ONLY when the outer box is at least as confident —
+# a stronger inner box wins and both are kept (see test_farband_containment.py).
+# Tolerance is a fraction of the outer box's shorter edge, so near-nested
+# boxes (a few px drift) count as contained.
+CONTAINMENT_TOL_RATIO = 0.05
+
+# Far-band rescue. Working close-range images always have box centers in the
+# top band of the frame; a far-distance photo has NONE (the far crates are
+# missed entirely). When that gap exists on a small image, crop the top band
+# and run one more inference: the crop re-magnifies the far region inside
+# YOLO's letterboxed 640x640 input for free. Far boxes clear only this
+# absolute floor — they are exempt from the relative-against-best filter,
+# which a strong close-range read would otherwise crush them with.
+FAR_BAND_FRACTION = 0.50        # top half of the frame is the "far band"
+FAR_BAND_FLOOR = 0.10          # absolute conf floor for far-band boxes
+FAR_BAND_MAX_LONG_SIDE = 1024  # ... on images this small or smaller
+
 
 def _iou(a: list, b: list) -> float:
     x1 = max(a[0], b[0]); y1 = max(a[1], b[1])
@@ -103,6 +122,111 @@ def suppress_duplicates(detections: list, iou_threshold: Optional[float] = None)
     for i, d in enumerate(kept, start=1):
         d["banana_id"] = i
     return kept
+
+
+def _is_contained(outer: list, inner: list, tolerance: float) -> bool:
+    """True when `inner` lies inside `outer` within `tolerance` pixels."""
+    ox1, oy1, ox2, oy2 = outer
+    ix1, iy1, ix2, iy2 = inner
+    return (
+        ix1 >= ox1 - tolerance
+        and iy1 >= oy1 - tolerance
+        and ix2 <= ox2 + tolerance
+        and iy2 <= oy2 + tolerance
+    )
+
+
+def discard_contained(detections: list) -> list:
+    """Containment-aware dedup, run after NMS.
+
+    Walks boxes in confidence order (strongest first). A box is discarded
+    when it sits fully inside an already-kept box — the classic "one big
+    crate box + one small banana box" overlap seen on far-distance bunches.
+    Because the walk is score-ordered, a weaker outer box can never
+    swallow a stronger inner one: the stronger box is kept first, and the
+    weaker one is then contained in the stronger. Tolerance scales with
+    the shorter edge of the kept box so near-nested reads count.
+    Re-numbers banana_id in confidence order.
+    """
+    ordered = sorted(detections, key=lambda d: d["confidence"], reverse=True)
+    kept: list = []
+    for d in ordered:
+        if any(
+            _is_contained(
+                k["bbox"],
+                d["bbox"],
+                CONTAINMENT_TOL_RATIO * min(k["bbox"][2] - k["bbox"][0],
+                                            k["bbox"][3] - k["bbox"][1]),
+            )
+            for k in kept
+        ):
+            continue
+        kept.append(d)
+    for i, d in enumerate(kept, start=1):
+        d["banana_id"] = i
+    return kept
+
+
+def far_band_gate(detections: list, H: int, W: int) -> bool:
+    """Decide whether the far-band rescue pass should run for this image.
+
+    Fires only when BOTH:
+      * no box center sits in the top FAR_BAND_FRACTION of the frame —
+        the far crates were missed by the full-frame pass; a working
+        close-range image always has centers up there, so it is untouched;
+      * the image is small enough (longest side <= FAR_BAND_MAX_LONG_SIDE)
+        that re-magnifying the far band through YOLO's 640x640 input
+        actually helps instead of just costing another inference.
+    """
+    band_limit = H * FAR_BAND_FRACTION
+    in_band = any(
+        (d["bbox"][1] + d["bbox"][3]) / 2 < band_limit for d in detections
+    )
+    if in_band:
+        return False
+    return max(W, H) <= FAR_BAND_MAX_LONG_SIDE
+
+
+def far_band_candidates(
+    detector: "BananaDetector",
+    image: np.ndarray,
+    floor: float = FAR_BAND_FLOOR,
+) -> List[Dict[str, Any]]:
+    """Infer on the top band crop and map boxes back to original coords.
+
+    The crop is a narrow strip; YOLO letterboxes it so the far region is
+    magnified in model-space relative to the full frame. Boxes are kept
+    only when they clear `floor` (an ABSOLUTE floor — these candidates are
+    exempt from the relative-against-best filter) and their center is back
+    inside the far band, so the pass can never add a box that belongs to
+    the near region. Clipped to image bounds; banana_id is re-numbered by
+    the caller's dedup passes.
+    """
+    img_h, img_w = image.shape[:2]
+    band_h = int(img_h * FAR_BAND_FRACTION)
+    if band_h < 2:
+        return []
+    band = image[0:band_h, :]
+    candidates: List[Dict[str, Any]] = []
+    for d in detector._run_inference(band, min(ADAPTIVE_INFERENCE_CONF, 0.05)):
+        if d["confidence"] < floor:
+            continue
+        bx = d["bbox"]
+        ox1 = max(0, min(bx[0], img_w - 1))
+        oy1 = max(0, min(bx[1], img_h - 1))
+        ox2 = max(0, min(bx[2], img_w - 1))
+        oy2 = max(0, min(bx[3], img_h - 1))
+        if ox2 <= ox1 or oy2 <= oy1:
+            continue
+        center_y = (oy1 + oy2) / 2
+        if center_y >= band_h:
+            continue  # box really belongs to the near region — not a far rescue
+        candidates.append({
+            "banana_id": 0,
+            "bbox": [ox1, oy1, ox2, oy2],
+            "confidence": d["confidence"],
+        })
+    return candidates
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -334,7 +458,7 @@ class BananaDetector:
             if not candidates:
                 return []
             candidates = relative_score_filter(candidates, absolute_floor=abs_floor)
-            return suppress_duplicates(candidates)
+            return discard_contained(suppress_duplicates(candidates))
 
         img_h, img_w = image.shape[:2]
 
@@ -356,6 +480,25 @@ class BananaDetector:
             )
 
         detections = _postprocess(candidates)
+
+        # Far-band rescue: when the full-frame read found NOTHING in the top
+        # band of the frame (far crates missed by the downsampled full-frame
+        # pass) AND the image is small, crop the top band, infer on it, and
+        # merge its boxes back in. Far boxes clear only FAR_BAND_FLOOR (they
+        # are exempt from the relative-against-best filter, which a strong
+        # close-range read would crush them with). NMS + containment dedup
+        # over the merged set keep the existing boxes intact.
+        if far_band_gate(detections, img_h, img_w):
+            far = far_band_candidates(self, image)
+            if far:
+                logger.info(
+                    f"Far-band rescue: no boxes in top band, found {len(far)} "
+                    f"far candidate(s) via band crop; merged into {len(detections)}."
+                )
+                merged = list(detections) + far
+                # Re-run NMS + containment over the full merged set so the
+                # far boxes dedup against the near boxes.
+                detections = discard_contained(suppress_duplicates(merged))
 
         # Pass 2: contrast-enhanced image at lower confidence
         if not detections:

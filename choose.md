@@ -13,6 +13,18 @@
 > fixed far-distance bunches — the 335×597 truck image went 4 → 9 detections
 > while close-range images stay bit-identical. Plus analytics-nav crash fix +
 > button centering. Details in `progress.md` / `learn/project-notes.md`.
+>
+> **(Next round, out of scope for this sheet):** **far-band rescue +
+> containment dedup** in `detection/banana_detector.py`. The slice-boost
+> gate proved inert on the far truck image (best conf 0.707 ≥ 0.35 gate),
+> so its far crates were still missed: a far-band crop pass now fires when
+> the top half of the frame has zero box centers (small images only) and
+> added the missing far crate (9 → 10 boxes on `images.jfif`); a
+> containment rule (drop a box fully inside a stronger kept box) removed
+> the nested-crate/box duplicate pair on working images
+> (`images (1)/(8).jfif` 14 → 9 each, 5 verified drops each). Working
+> close-range images verified unchanged. Details in `progress.md` /
+> `learn/project-notes.md`.
 
 Context: controlled enclosure + own LEDs, and we may co-design the optics with the
 hardware team. Problem being attacked: `color_analyzer.py` thresholds are absolute

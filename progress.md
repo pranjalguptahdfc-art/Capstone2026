@@ -1,6 +1,32 @@
 # BananaRipeness — Progress (as of 2026-10-28)
 
-## Slice boost + analytics-nav fixes (uncommitted, 2026-10-28)
+## Far-band rescue + containment dedup (uncommitted, 2026-10-28)
+
+Far-distance photos (`images.jfif`, 335×597 truck) still had **zero boxes in
+the top half of the frame** — the existing slice-boost gate was inert on it
+(best conf 0.707 ≥ 0.35 gate), so its far crates were missed entirely. Two
+additions to `main/detection/banana_detector.py` (non-teachable, no
+retraining):
+
+| Area | Change | Measured effect |
+|---|---|---|
+| `detection/banana_detector.py` | **Far-band rescue**: `far_band_gate` fires only when NO box center sits in the top 50% of the frame AND longest side ≤ 1024px; then `far_band_candidates` crops the top band and runs one extra YOLO pass (the crop re-magnifies the far region in YOLO's 640×640 input for free). Far boxes clear only `FAR_BAND_FLOOR=0.10` (exempt from the relative-against-best filter, which the image's 0.707 would crush them with) and are merged through NMS + containment | `images.jfif`: **9 → 10 boxes** — new far-band box (#10, conf 0.115, verified on the drawn-boxes image `verify_images_jfif_farboxes.png`: red box on the far green bunch, upper right). Gate fires on **no** working image (all have box centers in the top band) → regression guard |
+| `detection/banana_detector.py` | **Containment dedup** `discard_contained` (always on, after NMS): drop a box fully inside a stronger-or-equal kept box (5% of the outer's shorter edge tolerance) — the "one big crate box + one small banana box" overlap | `images (1).jfif` / `images (8).jfif`: **14 → 9 boxes each** (5 nested duplicates dropped, verified pair-by-pair); `images.jfif` keeps both boxes of its near-nested pair (inner 0.406 is stronger than outer 0.227 → both kept, per the agreed rule) |
+
+New tests: `main/tests/test_farband_containment.py` (11, model-free unit
+tests of the gate + containment semantics) and
+`main/tests/test_farband_regression.py` (3, live: re-runs real `detect()` on
+the 8 readable reference images and diffs against the recorded fixture
+`baseline_before.json` — working images may gain 0 boxes, lose only the 5
+recorded containment drops; `images.jfif` must gain its far-band box).
+Full suite: **81/81 green**.
+
+**Rollback point for this round: git tag `pre-far-band-rescue` = `0af16ae`.**
+`git checkout pre-far-band-rescue` restores the pre-change state; `rm` the
+untracked test files + `baseline_before.json` + `verify_render.py` /
+`verify_images_jfif_farboxes.png` to fully unwind.
+
+## Slice boost + analytics-nav fixes (committed f784cb0/b9f167c/0af16ae, 2026-10-28)
 
 Far-distance bunches (small photos, e.g. the 335×597 truck image) were
 detecting only 4 bananas because YOLO's 640×640 input downsamples the bunch
@@ -172,12 +198,12 @@ misreads dropped 6→2 (the target bug). Per-image + confusion tables:
 
 ```
 cd "D:\Pranjal Files\Capstone2026\BananaRipeness"
-git log --oneline -6            # a928f1b = main (color B + torch preload)
-git tag -l                      # rollback = a928f1b (pre-slice-boost); checkpoint-before-accuracy-work = 172b1f0
+git log --oneline -6            # main = 0af16ae (docs for slice-boost round)
+git tag -l                      # rollback = a928f1b; pre-far-band-rescue = 0af16ae; checkpoint-before-accuracy-work = 172b1f0
 python main/blind_batch.py      # 20-image smoke (default)
 python main/blind_batch.py --all   # full 154-image gate (~4 min CPU)
 python main/tests/verify_images.py # run the user's root test images
-python -m pytest main/tests/ -q    # 67 tests
+python -m pytest main/tests/ -q    # 81 tests
 python main/tests/verify_ui_button.py  # real-browser (Playwright) nav + alignment check
 ```
 
