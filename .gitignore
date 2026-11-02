@@ -42,9 +42,18 @@ annotated_*
 runs/
 output/
 
-# Markdown: ignore all .md docs except the non-teachable guide
+# Markdown: ignore scratch/decision-log .md files, but keep the docs that a
+# fresh clone needs: the project guide, the root README, and the hardware plan
+# (the README references it).
 *.md
 !main/NON_TEACHABLE_GUIDE.md
+!README.md
+!docs/esp32-hardware-integration.md
 
 # Large verification test artifacts (annotated PNGs + JSON exports)
 main/tests/verify/
+
+# Hardware: FruitAnalysis-0.cpp is a byte-identical duplicate of FruitAnalysis.cpp
+# (dropping both into one Arduino sketch folder breaks the build — duplicate
+# analyzeFruitData). Keep the canonical FruitAnalysis.cpp; ignore the dup.
+Hardware/FruitAnalysis-0.cpp

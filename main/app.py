@@ -28,6 +28,8 @@ from detection.banana_detector import BananaDetector
 from vision.color_analyzer import analyze_batch, annotate_colors
 from fusion.fusion_engine import FusionEngine
 from sensor.gas_reader import GasReader, ETHYLENE_LOW, ETHYLENE_HIGH, ETHYLENE_CRITICAL
+from hardware.esp32_client import ESP32Client, parse_address
+from hardware.lcd_line import build_lcd_lines
 from utils.image_utils import annotate_image, cv2_to_pil, pil_to_cv2
 from analytics_view import render_analytics_page
 from utils.analytics_store import log_inspection, compute_ripeness_metrics
@@ -134,6 +136,17 @@ def main():
                 serial_port = st.text_input("Serial port", value="COM3")
 
         st.divider()
+        st.subheader("Hardware (ESP32)")
+        use_hardware = st.checkbox("Enable ESP32 hardware", value=False, key="use_hardware")
+        hw_address = st.text_input(
+            "ESP32 address", value="192.168.1.100", key="hw_address",
+            help="IP or IP:port of the ESP32 web server (Hardware/ESP32_Fruit_Monitor.ino). "
+                 "No-hardware demo: run  python main/hardware/simulator.py  and use 127.0.0.1:8600.",
+        )
+        st.caption("Fetch pulls the last camera frame + sensor CSV, runs the same pipeline, "
+                   "and posts the verdict back to the on-board LCD.")
+
+        st.divider()
         st.subheader("Model Status")
         try:
             detector = load_detector()
@@ -166,13 +179,31 @@ def main():
         st.caption("Full bunch in frame = better accuracy.")
 
     st.subheader("Upload a banana bunch image")
-    uploaded = st.file_uploader(
-        "Choose an image", type=["jpg", "jpeg", "jfif", "png"],
-        label_visibility="collapsed",
-    )
+    _uc, _hc = st.columns([3, 2])
+    with _uc:
+        uploaded = st.file_uploader(
+            "Choose an image", type=["jpg", "jpeg", "jfif", "png"],
+            label_visibility="collapsed",
+        )
+    with _hc:
+        _hw_clicked = st.button(
+            "📷 Fetch from ESP32",
+            key="btn_fetch_hardware",
+            help="Pull the last camera frame + sensor CSV from the ESP32, run the "
+                 "same pipeline, and post the verdict to the on-board LCD.",
+            width="stretch",
+        )
+
+    if _hw_clicked:
+        if not use_hardware:
+            st.info("Enable **ESP32 hardware** in the sidebar first (checkbox + address).")
+        else:
+            _handle_hardware_fetch(detector, conf_threshold, _floor, hw_address)
+        return
 
     if uploaded is None:
-        st.info("Please upload a banana bunch image (JPG / JPEG / JFIF / PNG).")
+        st.info("Please upload a banana bunch image (JPG / JPEG / JFIF / PNG) "
+                "or fetch one from the ESP32.")
         return
 
     try:
@@ -181,6 +212,113 @@ def main():
         st.error(f"Could not read image: {e}")
         return
 
+    run_pipeline_and_render(
+        bgr_image,
+        detector,
+        conf_threshold,
+        _floor,
+        use_gas=use_gas,
+        gas_reader=gas_reader,
+        bunch_id=uploaded.name,
+        bunch_size=uploaded.size,
+        source_name=uploaded.name,
+    )
+
+
+def _handle_hardware_fetch(detector, conf_threshold, floor, address):
+    """ESP32 hardware path (Hardware/ESP32_Fruit_Monitor.ino):
+
+    1. GET /download_csv  → telemetry (DHT-11 + MQ-135, gas ppm when present)
+    2. GET /download_jpg  → last camera frame
+    3. run the *same* pipeline as an upload (detect → mask → color → fusion)
+    4. POST /verdict      → two ≤16-char lines the ESP32 flashes on its LCD
+    """
+    host, port = parse_address(address)
+    client = ESP32Client(host, port=port)
+    telemetry = client.fetch_telemetry()
+    bgr_image = client.fetch_image()
+
+    if telemetry is None and bgr_image is None:
+        st.warning(
+            f"ESP32 **offline** — could not reach **{address}**. Check that the "
+            "device is on the same network (the sketch prints its IP to Serial), "
+            "or run the no-hardware demo: `python main/hardware/simulator.py` and "
+            "use `127.0.0.1:8600`."
+        )
+        return
+
+    gas_reading = client.telemetry_to_gas_reading(telemetry) if telemetry is not None else None
+
+    if telemetry is not None:
+        _render_hardware_telemetry(telemetry, gas_reading)
+
+    if bgr_image is None:
+        st.info(
+            "ESP32 has no captured image yet (the first camera frame lands within "
+            "~15 s of boot). Sensor telemetry is shown above — fetch again shortly."
+        )
+        return
+
+    run_pipeline_and_render(
+        bgr_image,
+        detector,
+        conf_threshold,
+        floor,
+        use_gas=False,  # gas comes from the ESP32 telemetry, not the local reader
+        gas_reader=None,
+        bunch_id="esp32_capture",
+        gas_reading_override=gas_reading,
+        lcd_client=client,
+        telemetry=telemetry,
+    )
+
+
+def _render_hardware_telemetry(telemetry, gas_reading):
+    st.subheader("ESP32 Sensor Telemetry")
+    t1, t2 = st.columns(2)
+    if telemetry.get("temperature_c") is not None:
+        t1.metric("Temperature", f"{telemetry['temperature_c']:.1f} °C")
+    if telemetry.get("humidity_pct") is not None:
+        t2.metric("Humidity", f"{telemetry['humidity_pct']:.1f} %")
+    if gas_reading is not None:
+        st.caption(
+            f"Ethylene: **{gas_reading['ethylene_ppm']} ppm** → {gas_reading['status']} "
+            "(feeds the fusion engine)"
+        )
+    if telemetry.get("storage_condition"):
+        st.caption(f"Storage condition: {telemetry['storage_condition']}")
+
+
+def run_pipeline_and_render(
+    bgr_image,
+    detector,
+    conf_threshold,
+    floor,
+    use_gas,
+    gas_reader,
+    bunch_id,
+    bunch_size=None,
+    source_name=None,
+    gas_reading_override=None,
+    lcd_client=None,
+    telemetry=None,
+):
+    """Run the frozen pipeline (detect → mask → color → fusion) and render the
+    full result view.
+
+    Shared by the image-upload path and the ESP32 hardware path so both run
+    *identical* detection/analysis/fusion logic and show the same UI.
+
+    - ``bunch_id``   — the analytics-store key + CSV name (file name for uploads,
+      ``"esp32_capture"`` for the hardware path).
+    - ``source_name``— download-button filename (defaults to bunch_id).
+    - ``gas_reading_override`` — a ready-made gas dict (the ESP32 telemetry bridge);
+      when set, the serial/demo reader is bypassed.
+    - ``lcd_client``  — when provided, the verdict is also posted to the ESP32 LCD.
+    """
+    src = source_name or bunch_id
+    gas_reading = gas_reading_override
+
     img_h, img_w = bgr_image.shape[:2]
 
     with st.spinner("Detecting bananas..."):
@@ -188,7 +326,7 @@ def main():
             detections = detector.detect(
                 bgr_image,
                 confidence_threshold=conf_threshold,
-                floor=_floor,
+                floor=floor,
             )
         except Exception as e:
             st.error(f"Detection failed: {e}")
@@ -196,13 +334,14 @@ def main():
 
     if not detections:
         st.warning("**No bananas detected.**\n\nTry another image or lower confidence.")
+        if lcd_client is not None:
+            _post_lcd_verdict(lcd_client, {"bunch_status": "UNKNOWN"}, telemetry)
         return
 
     with st.spinner("Analyzing ripeness via color..."):
         color_analyses = analyze_batch(bgr_image, detections)
 
-    gas_reading = None
-    if use_gas:
+    if gas_reading is None and use_gas:
         with st.spinner("Reading gas sensor..."):
             gas_reading = gas_reader.read()
 
@@ -272,11 +411,11 @@ def main():
     )
 
     # ── Automated logging to 30-day analytics store ────────────────────────
-    log_key = f"{uploaded.name}_{uploaded.size}_{n_bananas}_{b_status}_{avg_ripeness_pct}"
+    log_key = f"{bunch_id}_{bunch_size}_{n_bananas}_{b_status}_{avg_ripeness_pct}"
     if st.session_state.get("last_logged_key") != log_key:
         gas_ppm = gas_reading["ethylene_ppm"] if gas_reading else 0.0
         log_inspection(
-            bunch_id=uploaded.name,
+            bunch_id=bunch_id,
             banana_count=n_bananas,
             avg_green=total_green,
             avg_yellow=total_yellow,
@@ -342,7 +481,10 @@ def main():
             })
         if rows:
             import pandas as pd
-            st.dataframe(pd.DataFrame(rows), width="content", hide_index=True)
+            df = pd.DataFrame(rows)
+            st.dataframe(df, width="content", hide_index=True)
+            # Per-banana table → auto CSV download (hardware handoff, step 1).
+            _render_results_csv(df, bunch_id)
 
     # ── Bunch-level metrics ────────────────────────────────────────────────
     st.markdown("---")
@@ -376,6 +518,10 @@ def main():
             f"CRITICAL >= {ETHYLENE_CRITICAL} ppm"
         )
 
+    # ── LCD verdict (ESP32 hardware path only) ─────────────────────────────
+    if lcd_client is not None:
+        _post_lcd_verdict(lcd_client, bunch, telemetry)
+
     # ── Download ───────────────────────────────────────────────────────────
     annotated_pil = cv2_to_pil(annotated_bgr)
     buf = io.BytesIO()
@@ -383,8 +529,33 @@ def main():
     st.download_button(
         label="Download annotated image",
         data=buf.getvalue(),
-        file_name=f"annotated_{uploaded.name}",
+        file_name=f"annotated_{src}",
         mime="image/png",
+    )
+
+
+def _post_lcd_verdict(lcd_client, bunch, telemetry):
+    """Build the two ≤16-char LCD lines and POST them to the ESP32."""
+    lines = build_lcd_lines(bunch, telemetry)
+    sent = lcd_client.post_verdict(lines)
+    if sent:
+        st.success(f"📟 Verdict sent to ESP32 LCD:  **{lines[0]}** / **{lines[1]}**")
+    else:
+        st.warning(
+            "ESP32 LCD verdict not delivered (no /verdict endpoint or offline). "
+            "The result above is still fully computed."
+        )
+
+
+def _render_results_csv(df, bunch_id):
+    """Downloadable per-banana ripeness table (hardware handoff step 1)."""
+    import pandas as pd
+    csv_bytes = df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="⬇️  Download per-banana table (CSV)",
+        data=csv_bytes,
+        file_name=f"ripeness_{bunch_id}.csv",
+        mime="text/csv",
     )
 
 

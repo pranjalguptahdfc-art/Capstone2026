@@ -144,7 +144,7 @@ The ESP-32 sends a JSON payload:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **Per-banana table → auto CSV download** | **TODO (hardware phase)** | The ripeness table on image upload is display-only today (`app.py` `st.dataframe`); the plan is to download it automatically as CSV so the hardware side can calibrate gas values against it. Step 1 of the hardware-integration workflow (see "Current Phase" above). |
+| **Per-banana table → CSV download** | **Done (2026-11-02)** | The ripeness table now has a download button (`app.py` `_render_results_csv`), and the ESP32 hardware path (`main/hardware/esp32_client.py`) fetches image + telemetry and posts the LCD verdict back — full loop in `docs/esp32-hardware-integration.md`. |
 | **Gas calibration in-repo** | **TODO (hardware phase)** | The hardware side hands calibrated gas-sensor values to this software, which performs the calibration and updates `analytics_view.py`. Step 2 of the workflow. |
 | **ESP-32 one-line LCD verdict** | **TODO (hardware phase)** | Render the final verdict as a single summary line for the ESP32 LCD, e.g. *"Acceptable, all banana bunches are mostly ripe. Few bananas will take 1 day to ripen."* Step 3 of the workflow. |
 | **Non-teachable detection (far-distance ceiling)** | **TODO (post-demo)** | The planned path is **retraining one YOLO on a combined close + far + far-crop dataset** (the documented alternative is pure-contour detection, which removes the ultralytics dependency). The far-band-rescue + containment layers in `b66a0b6` already recover what the COCO fallback can see. See `progress.md` "Hardware integration plan". |

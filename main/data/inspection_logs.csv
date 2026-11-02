@@ -325,3 +325,10 @@ timestamp,bunch_id,banana_count,decision,bunch_status,ripeness_stage,avg_ripenes
 2026-10-29 18:24:04,musa-acuminata-banana-9b90af04-394a-11ec-b91c-d8c4975e38aa_jpg.rf.9dff4ecf22b7edf8b5063458e033da9b.jpg,1,Approved,ACCEPTABLE,Unripe,46.8,0.0,45.0,8.5,0.0,LOW,No significant problems,"Mixed ripeness levels. (color only, no gas sensor)."
 2026-10-29 18:24:14,musa-acuminata-banana-9f73c633-4037-11ec-b9a3-94b86d66fd1d_jpg.rf.7c7e538397ef921dec583cf702747597.jpg,1,Approved,ACCEPTABLE,Ripe,86.5,0.0,87.1,12.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (87.1%) - ripe. (color only, no gas sensor)."
 2026-10-29 18:24:23,musa-acuminata-banana-9a657b7d-4037-11ec-8475-94b86d66fd1d_jpg.rf.1936397475e30850758ababc64fafac3.jpg,1,Approved,ACCEPTABLE,Ripe,73.5,3.0,71.9,11.9,0.0,MEDIUM,Mostly ripe,"Mostly yellow (71.9%) - ripe. (color only, no gas sensor)."
+2026-10-29 22:21:37,Screenshot 2026-10-19 224039.png,1,Denied,HIGH RISK,Overripe,54.2,0.2,21.8,35.6,0.0,MEDIUM,High brown (35.6%),"1/1 bananas overripe - approaching spoilage. (color only, no gas sensor)."
+2026-10-29 22:21:45,images (1).jfif,2,Approved,ACCEPTABLE,Ripe,89.0,0.0,66.8,32.3,0.0,MEDIUM,High brown (32.3%),"Mostly yellow (66.8%) - ripe. (color only, no gas sensor)."
+2026-10-29 22:56:14,images (8).jfif,1,Denied,HIGH RISK,Overripe,38.2,0.0,17.6,23.2,0.0,MEDIUM,High brown (23.2%),"1/1 bananas overripe - approaching spoilage. (color only, no gas sensor)."
+2026-10-29 23:08:11,images (2).jpg,26,Approved,ACCEPTABLE,Ripe,81.0,2.8,85.2,8.2,0.0,MEDIUM,Mostly ripe,"Mostly yellow (85.2%) - ripe. (color only, no gas sensor)."
+2026-10-31 18:43:26,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-11-02 18:43:53,images.jfif,10,Approved,ACCEPTABLE,Ripe,87.2,0.0,79.7,19.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (79.7%) - ripe. (color only, no gas sensor)."
+2026-11-02 18:56:32,images (1).jfif,1,Approved,ACCEPTABLE,Ripe,78.4,0.0,80.6,9.9,0.0,MEDIUM,Mostly ripe,"Mostly yellow (80.6%) - ripe. (color only, no gas sensor)."
