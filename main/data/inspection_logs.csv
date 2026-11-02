@@ -332,3 +332,15 @@ timestamp,bunch_id,banana_count,decision,bunch_status,ripeness_stage,avg_ripenes
 2026-10-31 18:43:26,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
 2026-11-02 18:43:53,images.jfif,10,Approved,ACCEPTABLE,Ripe,87.2,0.0,79.7,19.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (79.7%) - ripe. (color only, no gas sensor)."
 2026-11-02 18:56:32,images (1).jfif,1,Approved,ACCEPTABLE,Ripe,78.4,0.0,80.6,9.9,0.0,MEDIUM,Mostly ripe,"Mostly yellow (80.6%) - ripe. (color only, no gas sensor)."
+2026-11-02 19:32:38,JSSL38kC5N1dmRUqPbGgNmjSGYZK-FtqLXZcDgxYod2W0g6DIQzDkOOErdSEZPZToDlXUpMkiJV3vLrIY-5-PCYjgFKWlyFT_sVyqZPQ1Kwu2spf30b698lBiT8yT7QEvofzkzEceyFofymA-XC2azIlvY-mSwn1kwbtY191uzgXt22EkMQI3B1yspO_gvbw.jfif,1,Approved,SEMI-RIPE,Semi-Ripe,37.2,68.8,20.0,9.9,0.0,MEDIUM,No significant problems,"1/1 bananas mid-ripening - still maturing. (color only, no gas sensor)."
+2026-11-02 19:32:49,bunch.jfif,2,Denied,HIGH RISK,Overripe,83.9,0.0,63.9,29.6,0.0,MEDIUM,High brown (29.6%),"1/2 bananas overripe - approaching spoilage. (color only, no gas sensor)."
+2026-11-02 19:32:55,images (1).jfif,1,Approved,ACCEPTABLE,Ripe,78.4,0.0,80.6,9.9,0.0,MEDIUM,Mostly ripe,"Mostly yellow (80.6%) - ripe. (color only, no gas sensor)."
+2026-11-02 19:33:18,images (6).jpg,1,Approved,SEMI-RIPE,Semi-Ripe,32.6,74.8,25.2,0.0,0.0,MEDIUM,Mostly unripe,"1/1 bananas mid-ripening - still maturing. (color only, no gas sensor)."
+2026-11-02 19:33:27,images (8) (1).jpg,1,Denied,HIGH RISK,Overripe,37.1,0.1,17.2,22.5,0.0,MEDIUM,High brown (22.5%),"1/1 bananas overripe - approaching spoilage. (color only, no gas sensor)."
+2026-11-02 19:33:36,images (9).jfif,2,Approved,ACCEPTABLE,Unripe,15.4,99.3,0.5,0.1,0.0,MEDIUM,Mostly unripe,"Mostly green (99.3%) - unripe. (color only, no gas sensor)."
+2026-10-31 19:33:51,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-11-02 19:34:07,images.jfif,10,Approved,ACCEPTABLE,Ripe,87.2,0.0,79.7,19.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (79.7%) - ripe. (color only, no gas sensor)."
+2026-10-31 19:42:19,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-11-02 19:42:34,images.jfif,10,Approved,ACCEPTABLE,Ripe,87.2,0.0,79.7,19.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (79.7%) - ripe. (color only, no gas sensor)."
+2026-10-31 19:49:14,test_unit_bunch_001,8,Approved,ACCEPTABLE,Ripe,79.5,10.0,80.0,10.0,0.5,HIGH,None,Unit test bunch
+2026-11-02 19:49:35,images.jfif,10,Approved,ACCEPTABLE,Ripe,87.2,0.0,79.7,19.5,0.0,MEDIUM,Mostly ripe,"Mostly yellow (79.7%) - ripe. (color only, no gas sensor)."
