@@ -214,7 +214,7 @@ The simulator serves a bundled banana image for `/download_jpg`, a sample
 telemetry CSV for `/download_csv`, and captures your `POST /verdict`
 (rejecting any line longer than 16 chars, exactly like the firmware).
 
-You can point it at your own image: `python main/hardware/simulator.py --image "images (1).jfif"`.
+You can point it at your own image: `python main/hardware/simulator.py --image "main/tests/fixtures/images (1).jfif"`.
 
 ---
 

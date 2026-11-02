@@ -38,7 +38,7 @@ from typing import Dict, List, Optional
 import cv2
 
 _MAIN = Path(__file__).resolve().parent.parent          # main/
-_REPO_ROOT = _MAIN.parent                                # BananaRipeness/
+_FIXTURES = _MAIN / "tests" / "fixtures"                # bundled reference images
 sys.path.insert(0, str(_MAIN))
 
 from detection.banana_detector import BananaDetector          # noqa: E402
@@ -220,8 +220,8 @@ def verify_folder(
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("folder", nargs="?", default=str(_REPO_ROOT),
-                    help="folder of images (default: repo root, the user's test images)")
+    ap.add_argument("folder", nargs="?", default=str(_FIXTURES),
+                    help="folder of images (default: main/tests/fixtures, the bundled test images)")
     ap.add_argument("--out", default=str(DEFAULT_OUT),
                     help="output dir for JSON + annotated PNGs (default main/tests/verify)")
     ap.add_argument("--limit", type=int, default=None,

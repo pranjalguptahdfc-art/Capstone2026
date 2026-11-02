@@ -32,7 +32,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent  # == main/
 sys.path.insert(0, str(PROJECT_ROOT))
-ROOT = PROJECT_ROOT.parent  # repo root, where the fixture + images live
+FIXTURES = PROJECT_ROOT / "tests" / "fixtures"  # the reference images + baseline live here
 
 import cv2
 
@@ -43,7 +43,7 @@ except Exception:
 
 from detection.banana_detector import BananaDetector, FAR_BAND_FRACTION
 
-BASELINE = json.loads((ROOT / "baseline_before.json").read_text())
+BASELINE = json.loads((FIXTURES / "baseline_before.json").read_text())
 
 # Reference images: (filename, expected gained bboxes, expected lost bboxes).
 # A bbox here is (x1, y1, x2, y2) in original-image pixel coords, matched by
@@ -100,7 +100,7 @@ def _run_live():
     det = BananaDetector(device="cpu")
     results = {}
     for name, spec in EXPECTED.items():
-        img = cv2.imread(str(ROOT / name))
+        img = cv2.imread(str(FIXTURES / name))
         if img is None:
             results[name] = {"error": "unreadable"}
             continue

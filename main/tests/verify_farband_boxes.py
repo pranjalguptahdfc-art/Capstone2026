@@ -5,7 +5,8 @@ sys.path.insert(0, str(ROOT / "main"))
 import cv2, torch
 from detection.banana_detector import BananaDetector
 
-img = cv2.imread(str(ROOT / "images.jfif"))
+FIX = ROOT / "main" / "tests" / "fixtures"
+img = cv2.imread(str(FIX / "images.jfif"))
 det = BananaDetector(device="cpu")
 dets = det.detect(img)
 canvas = img.copy()

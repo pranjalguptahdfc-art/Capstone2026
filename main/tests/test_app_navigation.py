@@ -84,7 +84,7 @@ def test_app_view_analytics_button_end_to_end():
     at.run()
     assert not at.exception, [repr(e.value) for e in at.exception]
 
-    image_bytes = (PROJECT_ROOT.parent / "images.jfif").read_bytes()
+    image_bytes = (PROJECT_ROOT / "tests" / "fixtures" / "images.jfif").read_bytes()
     at.file_uploader[0].set_value(("images.jfif", image_bytes, "image/jpeg"))
     at.run()
     assert not at.exception, [repr(e.value) for e in at.exception]

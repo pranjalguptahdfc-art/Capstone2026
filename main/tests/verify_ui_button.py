@@ -37,7 +37,7 @@ def main():
         time.sleep(3)  # detector loads on first render
 
         # ── upload the .jfif file through the real uploader ──
-        page.locator('input[type="file"]').set_input_files(str(REPO_ROOT / "images.jfif"))
+        page.locator('input[type="file"]').set_input_files(str(REPO_ROOT / "main" / "tests" / "fixtures" / "images.jfif"))
 
         # wait for detection to finish: the View Analytics button appears
         wait_for(page, "button:has-text('View Analytics')", timeout=180000)

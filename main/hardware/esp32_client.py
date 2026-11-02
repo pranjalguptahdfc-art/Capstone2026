@@ -134,7 +134,7 @@ class ESP32Client:
             value = mapping.get(col)
             if value is None:
                 out[key] = None
-            elif key.endswith(("_c", "_pct", "_scale", "_ppm")) or key in ("temperature_c", "humidity_pct", "ripeness_scale"):
+            elif key.endswith(("_c", "_pct", "_scale", "_ppm")):
                 try:
                     out[key] = float(value)
                 except ValueError:

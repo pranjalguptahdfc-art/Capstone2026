@@ -40,14 +40,6 @@ logger = logging.getLogger(__name__)
 st.set_page_config(page_title="Banana Ripeness & Quality Analytics", page_icon="🍌", layout="wide")
 
 
-CANONICAL_DISPLAY = {
-    "unripe":     (" UNRIPE",   "#27ae60"),
-    "ripe":       (" RIPE",     "#f39c12"),
-    "semi-ripe":  (" SEMI-RIPE","#2980b9"),
-    "overripe":   (" OVERRIPE", "#e74c3c"),
-    "unknown":    (" UNKNOWN",  "#7f8c8d"),
-}
-
 RISK_COLORS = {
     "ACCEPTABLE":  "#27ae60",
     "SEMI-RIPE":   "#2980b9",

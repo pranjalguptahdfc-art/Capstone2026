@@ -72,9 +72,9 @@ class ESP32Simulator:
 
     @staticmethod
     def _default_image() -> bytes:
-        """A real repo test image when one is present, else a tiny valid JPEG."""
-        root = Path(__file__).resolve().parent.parent.parent  # repo root
-        candidate = root / "images.jfif"
+        """A bundled reference test image when present, else a tiny valid JPEG."""
+        fixtures = Path(__file__).resolve().parent.parent / "tests" / "fixtures"
+        candidate = fixtures / "images.jfif"
         if candidate.exists():
             return candidate.read_bytes()
         # Minimal 1×1 JPEG so the endpoint is still decodable in isolation.

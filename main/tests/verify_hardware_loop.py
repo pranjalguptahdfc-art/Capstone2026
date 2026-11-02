@@ -38,10 +38,11 @@ from detection.banana_detector import BananaDetector   # noqa: E402
 from vision.color_analyzer import analyze_batch        # noqa: E402
 from fusion.fusion_engine import FusionEngine          # noqa: E402
 
-# A repo test image that reliably detects bananas (close-range bunch).
-IMAGE = PROJECT_ROOT.parent / "images (1).jfif"
+# A bundled reference image that reliably detects bananas (close-range bunch).
+FIXTURES = PROJECT_ROOT / "tests" / "fixtures"
+IMAGE = FIXTURES / "images (1).jfif"
 if not IMAGE.exists():
-    IMAGE = PROJECT_ROOT.parent / "images.jfif"
+    IMAGE = FIXTURES / "images.jfif"
 
 
 def main():
