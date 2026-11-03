@@ -16,6 +16,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from utils.analytics_store import (
     compute_ripeness_metrics,
+    estimate_ripening_timeline,
     log_inspection,
     load_inspections,
     get_summary_metrics,
@@ -61,6 +62,24 @@ class TestAnalyticsStore(unittest.TestCase):
         self.assertEqual(decision, "Denied")
         self.assertEqual(stage, "Overripe")
         self.assertGreaterEqual(score, 75.0)
+
+    def test_estimate_ripening_timeline_by_stage(self):
+        self.assertEqual(
+            estimate_ripening_timeline("Unripe"), ("3-5 days", "6-9 days")
+        )
+        self.assertEqual(
+            estimate_ripening_timeline("semi-ripe"), ("1-2 days", "3-5 days")
+        )
+        self.assertEqual(
+            estimate_ripening_timeline("Ripe"), ("Already ripe", "2-3 days")
+        )
+        self.assertEqual(
+            estimate_ripening_timeline("Overripe"),
+            ("Already ripe", "Already overripe"),
+        )
+        self.assertEqual(
+            estimate_ripening_timeline("unknown"), ("Unavailable", "Unavailable")
+        )
 
     def test_log_inspection_and_load(self):
         ts = datetime.now() - timedelta(days=2)

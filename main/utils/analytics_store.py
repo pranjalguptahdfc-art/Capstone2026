@@ -123,6 +123,17 @@ def compute_ripeness_metrics(
     return stage, ripeness_pct, decision
 
 
+def estimate_ripening_timeline(stage: str) -> Tuple[str, str]:
+    """Return rough room-temperature estimates until ripe and overripe."""
+    estimates = {
+        "unripe": ("3-5 days", "6-9 days"),
+        "semi-ripe": ("1-2 days", "3-5 days"),
+        "ripe": ("Already ripe", "2-3 days"),
+        "overripe": ("Already ripe", "Already overripe"),
+    }
+    return estimates.get(stage.strip().lower(), ("Unavailable", "Unavailable"))
+
+
 def log_inspection(
     bunch_id: str,
     banana_count: int,

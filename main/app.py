@@ -32,7 +32,11 @@ from hardware.esp32_client import ESP32Client, parse_address
 from hardware.lcd_line import build_lcd_lines
 from utils.image_utils import annotate_image, cv2_to_pil, pil_to_cv2
 from analytics_view import render_analytics_page
-from utils.analytics_store import log_inspection, compute_ripeness_metrics
+from utils.analytics_store import (
+    log_inspection,
+    compute_ripeness_metrics,
+    estimate_ripening_timeline,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -400,6 +404,16 @@ def run_pipeline_and_render(
         f"<div style='font-size:11px; color:#92400e; font-weight:600;'>{stage.upper()}</div>"
         f"</div>",
         unsafe_allow_html=True,
+    )
+
+    days_until_ripe, days_until_overripe = estimate_ripening_timeline(stage)
+    st.markdown("#### Approximate Ripening Timeline (Room Temperature)")
+    timeline_ripe, timeline_overripe = st.columns(2)
+    timeline_ripe.metric("Time until ripe", days_until_ripe)
+    timeline_overripe.metric("Time until overripe", days_until_overripe)
+    st.caption(
+        "Rough estimate from visual ripeness stage only. Storage temperature, "
+        "handling, and ethylene exposure can change timing substantially."
     )
 
     # ── Automated logging to 30-day analytics store ────────────────────────
